@@ -39,6 +39,26 @@ public class SimpleWebClient {
 
                 System.out.println("Original message:"+userInput);
 
+                //second try(working) to pass ElGamal stuff to server
+                ElGamalPrivateKey privateKey = ElGamal.generateKeyPair(10);
+                System.out.println("Test Private key == " + privateKey.getPrivateKey());
+
+                ElGamalPublicKey publicKey;
+                publicKey = privateKey.getPublicKey();
+
+                System.out.println("Test private key G == " + publicKey.getG());
+                System.out.println("Test private key P == " + publicKey.getP());
+                System.out.println("Test private key B == " + publicKey.getB());
+
+                ElGamalMessage eMessage= ElGamal.encryptMessage(publicKey,userInput);
+                System.out.println("Elgamal message:"+eMessage);
+
+                System.out.println("passing keys and message to server: ");
+                String totalMessage = privateKey.getPrivateKey() + " " + publicKey.getG() + " " + publicKey.getP() + " " + publicKey.getB()
+                                                                 + " " + userInput + " " + eMessage;
+                System.out.println(totalMessage);
+                out.writeUTF(String.valueOf(totalMessage));
+                //second try ends
                 /* Trying to use Elgamal, Testing failed
                 
                 // take user input and encrypt with elgamal
@@ -53,7 +73,7 @@ public class SimpleWebClient {
 
 
                  */
-                out.writeUTF(String.valueOf(userInput));
+                //out.writeUTF(String.valueOf(userInput));
                 out.flush();
                 out.close();
             }
