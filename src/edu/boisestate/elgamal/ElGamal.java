@@ -5,7 +5,7 @@ import java.security.SecureRandom;
 
 public class ElGamal {
 
-    private final static int PRIME_UNCERTAINTY = 100000;
+    private final static int PRIME_UNCERTAINTY = 1000000;
     private final static SecureRandom rnd = new SecureRandom();
 
     /**
@@ -19,6 +19,7 @@ public class ElGamal {
         BigInteger b = new BigInteger(bits, rnd);
         b = b.mod(p.subtract(BigInteger.valueOf(2))).add(BigInteger.valueOf(2)); // random value between 2 and p-2
         assert g != null;
+        System.err.println(g);
         BigInteger B = g.modPow(b, p);
         ElGamalPublicKey publicKey = new ElGamalPublicKey();
         publicKey.setP(p);
@@ -38,7 +39,8 @@ public class ElGamal {
      * @return
      */
     public static ElGamalMessage encryptMessage(ElGamalPublicKey publicKey, BigInteger message) {
-        if (message.compareTo(publicKey.getP()) >= 0 || message.compareTo(BigInteger.ONE) < 0) {
+        if (message.compareTo(publicKey.getP()) >= 0 || message.compareTo(BigInteger.ZERO) == 0) {
+            System.out.println("coming here");
             return null;
         }
 
