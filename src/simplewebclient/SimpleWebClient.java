@@ -5,15 +5,12 @@ import java.math.BigInteger;
 import java.net.*;
 import java.util.Scanner;
 
-import edu.boisestate.elgamal.ElGamal;
-import edu.boisestate.elgamal.ElGamalMessage;
-import edu.boisestate.elgamal.ElGamalPrivateKey;
-import edu.boisestate.elgamal.ElGamalPublicKey;
+import edu.boisestate.elgamal.*;
+
 
 public class SimpleWebClient {
     private static final String hostName = "localhost";
     private static final int PORT = 8089;
-
     public static void main(String[] args) throws IOException {
         try (
                 Socket serverSocket = new Socket(hostName, PORT);
@@ -30,6 +27,7 @@ public class SimpleWebClient {
         ) {
             //String userInput;
 
+
             // Read Biginteger input from client
             BigInteger userInput;
             Scanner sc = new Scanner(System.in);
@@ -39,6 +37,22 @@ public class SimpleWebClient {
 
                 System.out.println("Original message:"+userInput);
 
+                // convert UserInput to Binary
+                BitbyBitEncryptionTable binary = new BitbyBitEncryptionTable();
+                String s = binary.binaryTostring(userInput);
+                System.out.println("Binary form:"+s);
+
+                // split string bit by bit and Encrypt each bit
+                binary.splitstringAndencryption(s);
+
+
+
+
+
+
+
+
+                /*
                 //second try(working) to pass ElGamal stuff to server
                 ElGamalPrivateKey privateKey = ElGamal.generateKeyPair(10);
                 System.out.println("Test Private key == " + privateKey.getPrivateKey());
@@ -50,6 +64,8 @@ public class SimpleWebClient {
                 System.out.println("Test private key P == " + publicKey.getP());
                 System.out.println("Test private key B == " + publicKey.getB());
 
+
+
                 ElGamalMessage eMessage= ElGamal.encryptMessage(publicKey,userInput);
                 System.out.println("Elgamal message:"+eMessage);
 
@@ -58,6 +74,9 @@ public class SimpleWebClient {
                                                                  + " " + userInput + " " + eMessage;
                 System.out.println(totalMessage);
                 out.writeUTF(String.valueOf(totalMessage));
+
+                */
+
                 //second try ends
                 /* Trying to use Elgamal, Testing failed
                 
