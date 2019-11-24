@@ -1,6 +1,8 @@
 package GreaterThanFunction;
 
 import java.math.BigInteger;
+import java.util.concurrent.ThreadLocalRandom;
+
 import Tables.TableRow;
 
 public class GreaterThanFunction
@@ -89,4 +91,25 @@ public class GreaterThanFunction
                                + "         " + tableRow[i].getOutA() + "          " + tableRow[i].getOutB());
         }
     }
+    public void ShuffleTable()
+    {
+        int rand_int1, rand_int2;
+        TableRow temp;
+
+        for(int i=0;i<10;i++)
+        {
+            rand_int1 = ThreadLocalRandom.current().nextInt();
+            rand_int2 = ThreadLocalRandom.current().nextInt();
+            if(rand_int1 < 0) rand_int1 = rand_int1 * (-1);
+            if(rand_int2 < 0) rand_int2 = rand_int2 * (-1);
+            rand_int1 = rand_int1 % 12;
+            rand_int2 = rand_int2 % 12;
+            //System.out.println("rand ints = " + rand_int1 + " , " + rand_int2);
+
+            temp = tableRow[rand_int1];
+            tableRow[rand_int1] = tableRow[rand_int2];
+            tableRow[rand_int2] = temp;
+        }
+    }
+
 }
