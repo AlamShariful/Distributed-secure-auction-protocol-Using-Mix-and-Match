@@ -50,5 +50,7 @@ public class TestGreaterThanTable {
         GreaterThanFunction greaterThanFunction = new GreaterThanFunction(encOne, encNegOne, encZeroAlt, encZeroAlt);   //sign is equal
         greaterThanFunction.generateFullGreaterThanTable();
         greaterThanFunction.PrintTable();
+        greaterThanFunction.ShuffleTable();
+        greaterThanFunction.PrintTable();
     }
 }
