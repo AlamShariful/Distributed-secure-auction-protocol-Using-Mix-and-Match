@@ -1,21 +1,23 @@
 package Tables;
 
+import edu.boisestate.elgamal.ElGamalMessage;
+
 import java.math.BigInteger;
 
 public class SenderEncryptionTableRow {
-    private BigInteger[] input;
+    private ElGamalMessage[] input;
 
     public SenderEncryptionTableRow()
     {
-        input = new BigInteger[1024];
+        input = new ElGamalMessage[1024];
     }
 
-    public void setInput(BigInteger input, int index)
+    public void setInput(ElGamalMessage input, int index)
     {
         this.input[index] = input;
     }
 
-    public BigInteger[] getInput()
+    public ElGamalMessage[] getInput()
     {
         return this.input;
     }

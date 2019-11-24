@@ -44,15 +44,15 @@ public class SimpleWebClient {
                 System.out.println("Binary form:"+s);
 
                 // split string bit by bit and Encrypt each bit
-                BigInteger [] getInputTable= binary.splitstringAndencryption(s);
+                ElGamalMessage [] getInputTable= binary.splitstringAndencryption(s);
 
                 for (int i=0; i<getInputTable.length;i++){
-                    System.out.println("Table Output"+getInputTable[i]);
+                    System.out.println("Table Output"+getInputTable[i].getEncryptedMessage() + " , " + getInputTable[i].getEphimeralKey());
                     //ciphertext=ciphertext.concat(getInputTable[i].toString());
                     if (ciphertext == ""){
-                        ciphertext=getInputTable[i].toString();
+                        ciphertext=getInputTable[i].getEncryptedMessage().toString() + "," + getInputTable[i].getEphimeralKey().toString();
                     }else{
-                        ciphertext=ciphertext +"."+getInputTable[i].toString();
+                        ciphertext=ciphertext +"."+getInputTable[i].getEncryptedMessage().toString() + "," + getInputTable[i].getEphimeralKey().toString();
                     }
 
                     System.out.println("Ciphertext"+ciphertext);
