@@ -31,6 +31,7 @@ public class SimpleWebClient {
             // Read Biginteger input from client
             BigInteger userInput;
             Scanner sc = new Scanner(System.in);
+            String ciphertext="";
 
             //if ((userInput = stdIn.readLine()) != null) {
             if ((userInput = sc.nextBigInteger()) != null) {
@@ -43,11 +44,24 @@ public class SimpleWebClient {
                 System.out.println("Binary form:"+s);
 
                 // split string bit by bit and Encrypt each bit
-                binary.splitstringAndencryption(s);
+                BigInteger [] getInputTable= binary.splitstringAndencryption(s);
 
+                for (int i=0; i<getInputTable.length;i++){
+                    System.out.println("Table Output"+getInputTable[i]);
+                    //ciphertext=ciphertext.concat(getInputTable[i].toString());
+                    if (ciphertext == ""){
+                        ciphertext=getInputTable[i].toString();
+                    }else{
+                        ciphertext=ciphertext +"."+getInputTable[i].toString();
+                    }
 
+                    System.out.println("Ciphertext"+ciphertext);
+                }
 
-
+                // Sending Cipher text to Server
+                out.writeUTF(ciphertext);
+                out.flush();
+                out.close();
 
 
 
@@ -90,11 +104,12 @@ public class SimpleWebClient {
                 System.out.println("Elgamal message:"+eMessage);
 
 
+                */
 
-                 */
-                //out.writeUTF(String.valueOf(userInput));
-                out.flush();
-                out.close();
+
+
+
+
             }
         } catch (UnknownHostException e) {
             System.err.println("Don't know about host " + hostName);

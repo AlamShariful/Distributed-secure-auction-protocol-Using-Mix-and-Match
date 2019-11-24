@@ -12,7 +12,7 @@ public class BitbyBitEncryptionTable {
     }
 
 
-    public static void splitstringAndencryption(String s){
+    public static BigInteger[] splitstringAndencryption(String s){
 
         //padding
         int siz = s.length();
@@ -76,6 +76,8 @@ public class BitbyBitEncryptionTable {
 
 
         }
+        return senderEncryptionTableRow.getInput();
+
 
     }
 
