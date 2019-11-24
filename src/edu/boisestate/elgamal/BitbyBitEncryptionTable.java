@@ -12,7 +12,7 @@ public class BitbyBitEncryptionTable {
     }
 
 
-    public static BigInteger[] splitstringAndencryption(String s){
+    public static ElGamalMessage[] splitstringAndencryption(String s){
 
         //padding
         int siz = s.length();
@@ -57,7 +57,7 @@ public class BitbyBitEncryptionTable {
 
                 // Apply Elgamal Encryption
                 ElGamalMessage eMessage= ElGamal.encryptMessage(publicKey,one);
-                senderEncryptionTableRow.setInput(eMessage.getEncryptedMessage(), i);
+                senderEncryptionTableRow.setInput(eMessage, i);
                 System.out.println("Elgamal message:"+eMessage.getEncryptedMessage());
 
             }else{
@@ -69,7 +69,7 @@ public class BitbyBitEncryptionTable {
 
                 // Apply Elgamal Encryption
                 ElGamalMessage eMessage= ElGamal.encryptMessage(publicKey,zero);
-                senderEncryptionTableRow.setInput(eMessage.getEncryptedMessage(), i);
+                senderEncryptionTableRow.setInput(eMessage, i);
                 System.out.println("Elgamal message:"+eMessage.getEncryptedMessage());
             }
 
