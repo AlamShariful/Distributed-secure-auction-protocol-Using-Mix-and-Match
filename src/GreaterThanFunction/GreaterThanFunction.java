@@ -4,14 +4,15 @@ import java.math.BigInteger;
 import java.util.concurrent.ThreadLocalRandom;
 
 import Tables.TableRow;
+import edu.boisestate.elgamal.ElGamalMessage;
 
 public class GreaterThanFunction
 {
     private TableRow[] tableRow;
-    private BigInteger encOfOne, encOfNegOne, encOfZeroAlt;
-    private BigInteger previousSign;
+    private ElGamalMessage encOfOne, encOfNegOne, encOfZeroAlt;
+    private ElGamalMessage previousSign;
 
-    public GreaterThanFunction(BigInteger mEncOfOne, BigInteger mEncOfNegOne, BigInteger mEncOfZeroAlt, BigInteger mPreviousSign)
+    public GreaterThanFunction(ElGamalMessage mEncOfOne, ElGamalMessage mEncOfNegOne, ElGamalMessage mEncOfZeroAlt, ElGamalMessage mPreviousSign)
     {
         tableRow = new TableRow[12];
 
@@ -55,9 +56,9 @@ public class GreaterThanFunction
             else if(a < b)  tableRow[i].setSign(encOfNegOne);  //negative one represents that the second one is greater
 
             //set outA
-            if(previousSign.equals(encOfOne))         tableRow[i].setOutA(encOfOne);
-            else if(previousSign.equals(encOfNegOne)) tableRow[i].setOutA(encOfNegOne);
-            else if(previousSign.equals(encOfZeroAlt))
+            if(previousSign.getEncryptedMessage().equals(encOfOne.getEncryptedMessage()) && previousSign.getEphimeralKey().equals(encOfOne.getEphimeralKey()))         tableRow[i].setOutA(encOfOne);
+            else if(previousSign.getEncryptedMessage().equals(encOfNegOne.getEncryptedMessage()) && previousSign.getEphimeralKey().equals(encOfNegOne.getEphimeralKey())) tableRow[i].setOutA(encOfNegOne);
+            else if(previousSign.getEncryptedMessage().equals(encOfZeroAlt.getEncryptedMessage()) && previousSign.getEphimeralKey().equals(encOfZeroAlt.getEphimeralKey()))
             {
                 if(a > b)       tableRow[i].setOutA(encOfOne);
                 else if(a == b) tableRow[i].setOutA(encOfZeroAlt);
@@ -65,8 +66,8 @@ public class GreaterThanFunction
             }
 
             //set outB
-            if(tableRow[i].getOutA().equals(encOfOne)) tableRow[i].setOutB(encOfNegOne);
-            else if(tableRow[i].getOutA().equals(encOfNegOne)) tableRow[i].setOutB(encOfOne);
+            if(tableRow[i].getOutA().getEncryptedMessage().equals(encOfOne.getEncryptedMessage()) && tableRow[i].getOutA().getEphimeralKey().equals(encOfOne.getEphimeralKey())) tableRow[i].setOutB(encOfNegOne);
+            else if(tableRow[i].getOutA().getEncryptedMessage().equals(encOfNegOne.getEncryptedMessage()) && tableRow[i].getOutA().getEphimeralKey().equals(encOfNegOne.getEphimeralKey())) tableRow[i].setOutB(encOfOne);
             else tableRow[i].setOutB(encOfZeroAlt);
 
             //update a

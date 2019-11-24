@@ -1,25 +1,27 @@
 package Tables;
 
+import edu.boisestate.elgamal.ElGamalMessage;
+
 import java.math.BigInteger;
 
 public class TableRow
 {
-    private BigInteger Ai, Bi, sign, outA, outB;
+    private ElGamalMessage Ai, Bi, sign, outA, outB;
 
     public TableRow()
     {
-        Ai = Bi = sign = outA = outB = BigInteger.ZERO;
+        Ai = Bi = sign = outA = outB = null;
     }
 
-    public void setAi(BigInteger nAi) { Ai = nAi; }
-    public void setBi(BigInteger nBi) { Bi = nBi; }
-    public void setSign(BigInteger nSign) { sign = nSign; }
-    public void setOutA(BigInteger nOutA) { outA = nOutA; }
-    public void setOutB(BigInteger nOutB) { outB = nOutB; }
+    public void setAi(ElGamalMessage nAi) { Ai = nAi; }
+    public void setBi(ElGamalMessage nBi) { Bi = nBi; }
+    public void setSign(ElGamalMessage nSign) { sign = nSign; }
+    public void setOutA(ElGamalMessage nOutA) { outA = nOutA; }
+    public void setOutB(ElGamalMessage nOutB) { outB = nOutB; }
 
-    public BigInteger getAi(){ return Ai; }
-    public BigInteger getBi(){ return Bi; }
-    public BigInteger getSign(){ return sign; }
-    public BigInteger getOutA(){ return outA; }
-    public BigInteger getOutB(){ return outB; }
+    public ElGamalMessage getAi(){ return Ai; }
+    public ElGamalMessage getBi(){ return Bi; }
+    public ElGamalMessage getSign(){ return sign; }
+    public ElGamalMessage getOutA(){ return outA; }
+    public ElGamalMessage getOutB(){ return outB; }
 }
