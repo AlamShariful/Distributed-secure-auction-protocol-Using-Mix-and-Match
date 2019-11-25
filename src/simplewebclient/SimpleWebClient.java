@@ -5,6 +5,7 @@ import java.math.BigInteger;
 import java.net.*;
 import java.util.Scanner;
 
+import PET.CheckPET;
 import edu.boisestate.elgamal.*;
 
 
@@ -73,6 +74,12 @@ public class SimpleWebClient {
                 out.flush();
                 out.close();
 
+                ElGamalMessage m1= ElGamal.encryptMessage(publicKey,BigInteger.valueOf(1));
+                ElGamalMessage m2= ElGamal.encryptMessage(publicKey,BigInteger.valueOf(1));
+
+                CheckPET check=new CheckPET();
+                Boolean result =check.checkEqualityOfTwoMessage(m1,m2,privateKey);
+                System.out.println(result);
 
 
 
