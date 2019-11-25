@@ -1,10 +1,8 @@
 package ElgamalTest;
 
 import GreaterThanFunction.GreaterThanFunction;
-import edu.boisestate.elgamal.ElGamal;
-import edu.boisestate.elgamal.ElGamalMessage;
-import edu.boisestate.elgamal.ElGamalPrivateKey;
-import edu.boisestate.elgamal.ElGamalPublicKey;
+import PET.CheckPET;
+import edu.boisestate.elgamal.*;
 
 import java.math.BigInteger;
 
@@ -12,7 +10,7 @@ public class TestGreaterThanTable {
     public static void main(String[] args)
     {
 
-        ElGamalPrivateKey privateKey = ElGamal.generateKeyPair(12);
+        ElGamalPrivateKey privateKey = ElGamal.generateKeyPair(20);
         System.out.println("Test Private key == " + privateKey.getPrivateKey());
 
         ElGamalPublicKey publicKey;
@@ -23,9 +21,10 @@ public class TestGreaterThanTable {
         System.out.println("Test private key B == " + publicKey.getB());
 
         //new let's test GreaterThanFunction
-        BigInteger one = BigInteger.ONE;
-        BigInteger negOne = one.negate();
-        BigInteger zeroAlt = BigInteger.valueOf(50);    //just for test, assuming that we represent 0 with 50
+        //BigInteger one = BigInteger.ONE;
+        BigInteger one = BigInteger.valueOf(1);
+        BigInteger negOne = publicKey.GetNegOneAlternative();    //just for test, assuming that we represent -1 with 2
+        BigInteger zeroAlt = publicKey.GetZeroAlternative();    //just for test, assuming that we represent 0 with 50
         System.out.println("onr = " + one + " and negOne = " + negOne);
 
         ElGamalMessage encOne, encNegOne, encZeroAlt;
@@ -50,5 +49,63 @@ public class TestGreaterThanTable {
         greaterThanFunction.PrintTable();
         greaterThanFunction.ShuffleTable();
         greaterThanFunction.PrintTable();
+
+
+        //so table genration is done, now let's check if it works on cipher texts
+        //getting two cipher text
+        BigInteger num1 = BigInteger.valueOf(10);
+        BigInteger num2 = BigInteger.valueOf(15);
+
+        BitbyBitEncryptionTable binary = new BitbyBitEncryptionTable();
+        String num1S = binary.binaryTostring(num1);
+        String num2S = binary.binaryTostring(num2);
+
+        System.out.println("first value in binary: " + num1S);
+        System.out.println("Second value in binary: " + num2S);
+
+        ElGamalMessage [] encNum1= binary.splitstringAndencryption(num1S, publicKey);
+        ElGamalMessage [] encNum2= binary.splitstringAndencryption(num2S, publicKey);
+
+        System.out.println(encNum1[0]);
+        //ElGamalMessage e1 = ElGamal.encryptMessage(publicKey, num1);
+        //ElGamalMessage e2 = ElGamal.encryptMessage(publicKey, num2);
+
+        //same enc test
+        encOne = ElGamal.encryptMessage(publicKey, one);
+        System.out.println("enc1 = " + encOne.getEncryptedMessage() + ", " + encOne.getEphimeralKey());
+
+        encOne = ElGamal.encryptMessage(publicKey, one);
+        System.out.println("enc1 = " + encOne.getEncryptedMessage() + ", " + encOne.getEphimeralKey());
+
+        encOne = ElGamal.encryptMessage(publicKey, one);
+        System.out.println("enc1 = " + encOne.getEncryptedMessage() + ", " + encOne.getEphimeralKey());
+
+        encOne = ElGamal.encryptMessage(publicKey, one);
+        System.out.println("enc1 = " + encOne.getEncryptedMessage() + ", " + encOne.getEphimeralKey());
+
+        //PET finction test
+        ElGamalMessage one1, one2;
+
+        one1 = ElGamal.encryptMessage(publicKey, one);
+        System.out.println("one1 = " + one1.getEncryptedMessage() + ", " + one1.getEphimeralKey());
+
+        one2 = ElGamal.encryptMessage(publicKey, one);
+        System.out.println("one2 = " + one2.getEncryptedMessage() + ", " + one2.getEphimeralKey());
+
+        encNegOne = ElGamal.encryptMessage(publicKey, negOne);
+        System.out.println("neg1 = " + encNegOne.getEncryptedMessage() + ", " + encNegOne.getEphimeralKey());
+
+        //decryption test
+        BigInteger decryptedMessage;
+        decryptedMessage = ElGamal.decryptMessage(one1, privateKey);
+        System.out.println("decrypted message == " + decryptedMessage);
+
+        decryptedMessage = ElGamal.decryptMessage(encNegOne, privateKey);
+        System.out.println("decrypted message == " + decryptedMessage);
+        //end
+        CheckPET checkpet = new CheckPET();
+
+        boolean result = checkpet.checkEqualityOfTwoMessage(encNegOne, encNegOne, privateKey);
+        System.out.println("result == "  + result);
     }
 }
