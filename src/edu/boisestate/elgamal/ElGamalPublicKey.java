@@ -6,7 +6,12 @@ public class ElGamalPublicKey {
     private BigInteger p;
     private BigInteger g;
     private BigInteger B;
+    private static BigInteger zeroAlternative = BigInteger.valueOf(51);
 
+    public BigInteger GetZeroAlternative()
+    {
+        return zeroAlternative;
+    }
     public BigInteger getP() {
         return p;
     }
