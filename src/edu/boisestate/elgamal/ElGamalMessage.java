@@ -20,6 +20,7 @@ public class ElGamalMessage {
     }
 
     public BigInteger getEncryptedMessage() {
+        //System.out.println("returning == " + encryptedMessage);
         return encryptedMessage;
     }
 
