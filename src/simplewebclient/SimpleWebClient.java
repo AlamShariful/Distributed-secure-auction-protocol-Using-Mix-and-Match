@@ -43,8 +43,18 @@ public class SimpleWebClient {
                 String s = binary.binaryTostring(userInput);
                 System.out.println("Binary form:"+s);
 
+                ElGamalPrivateKey privateKey = ElGamal.generateKeyPair(12);
+                System.out.println("Test Private key == " + privateKey.getPrivateKey());
+
+                ElGamalPublicKey publicKey;
+                publicKey = privateKey.getPublicKey();
+
+                System.out.println("Test private key G == " + publicKey.getG());
+                System.out.println("Test private key P == " + publicKey.getP());
+                System.out.println("Test private key B == " + publicKey.getB());
+
                 // split string bit by bit and Encrypt each bit
-                ElGamalMessage [] getInputTable= binary.splitstringAndencryption(s);
+                ElGamalMessage [] getInputTable= binary.splitstringAndencryption(s, publicKey);
 
                 for (int i=0; i<getInputTable.length;i++){
                     System.out.println("Table Output"+getInputTable[i].getEncryptedMessage() + " , " + getInputTable[i].getEphimeralKey());

@@ -12,7 +12,7 @@ public class BitbyBitEncryptionTable {
     }
 
 
-    public static ElGamalMessage[] splitstringAndencryption(String s){
+    public static ElGamalMessage[] splitstringAndencryption(String s, ElGamalPublicKey publicKey){
 
         //padding
         int siz = s.length();
@@ -28,19 +28,16 @@ public class BitbyBitEncryptionTable {
 
         //adding padding
         s = allZeroes.concat(s);
-
-
-        ElGamalPrivateKey privateKey = ElGamal.generateKeyPair(10);
-        System.out.println("Test Private key == " + privateKey.getPrivateKey());
-
-        ElGamalPublicKey publicKey;
-        publicKey = privateKey.getPublicKey();
+        System.out.println("number string after adding padding: " + s);
 
         System.out.println("Test private key G == " + publicKey.getG());
         System.out.println("Test private key P == " + publicKey.getP());
         System.out.println("Test private key B == " + publicKey.getB());
 
         SenderEncryptionTableRow senderEncryptionTableRow = new SenderEncryptionTableRow();
+
+        BigInteger one = BigInteger.ONE;
+        BigInteger zeroAlt = publicKey.GetZeroAlternative();
 
 
         // split binary string into bit by bit
@@ -52,8 +49,6 @@ public class BitbyBitEncryptionTable {
                 // Current bit is 1. Send encryption of something
                 System.out.println("Inside if:"+ s.charAt(i));
 
-                // Convert Character into BigInteger for encryption, Change it accordingly
-                BigInteger one = BigInteger.ONE;
 
                 // Apply Elgamal Encryption
                 ElGamalMessage eMessage= ElGamal.encryptMessage(publicKey,one);
@@ -64,11 +59,9 @@ public class BitbyBitEncryptionTable {
                 // Current Bit is 0. Send encryption of something
                 System.out.println("Inside else:"+ s.charAt(i));
 
-                // Convert Character into BigInteger for encryption,Change it accordingly
-                BigInteger zero = BigInteger.valueOf(50);
 
                 // Apply Elgamal Encryption
-                ElGamalMessage eMessage= ElGamal.encryptMessage(publicKey,zero);
+                ElGamalMessage eMessage= ElGamal.encryptMessage(publicKey,zeroAlt);
                 senderEncryptionTableRow.setInput(eMessage, i);
                 System.out.println("Elgamal message:"+eMessage.getEncryptedMessage());
             }
