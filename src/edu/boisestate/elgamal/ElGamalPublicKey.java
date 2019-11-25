@@ -6,11 +6,16 @@ public class ElGamalPublicKey {
     private BigInteger p;
     private BigInteger g;
     private BigInteger B;
-    private static BigInteger zeroAlternative = BigInteger.valueOf(51);
+    private static BigInteger zeroAlternative = BigInteger.valueOf(3);
+    private static BigInteger negOneAlternative = BigInteger.valueOf(2);
 
     public BigInteger GetZeroAlternative()
     {
         return zeroAlternative;
+    }
+    public BigInteger GetNegOneAlternative()
+    {
+        return negOneAlternative;
     }
     public BigInteger getP() {
         return p;

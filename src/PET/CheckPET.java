@@ -20,15 +20,21 @@ public class CheckPET {
         alphaMessage2 = m2.getEncryptedMessage();
         betaMessage2 = m2.getEphimeralKey();
 
+        System.out.println("first message == " + m1.getEncryptedMessage() + ", " + m1.getEphimeralKey());
+        System.out.println("second message == " + m2.getEncryptedMessage() + ", " + m2.getEphimeralKey());
         //Divide m1/m2
         divideAlpha = alphaMessage1.divide(alphaMessage2);
         divideBeta =betaMessage1.divide(betaMessage2);
 
-        ElGamalMessage newelgamal=new ElGamalMessage(divideAlpha,divideBeta);
+        System.out.println("divideAlpha == " + divideAlpha);
+       System.out.println("divideBeta == " + divideBeta);
+
+        ElGamalMessage newelgamal=new ElGamalMessage(divideBeta, divideAlpha);
 
 
         //decreypt result
        decryptmessage=ElGamal.decryptMessage(newelgamal, privateKey);
+       System.out.println("decrypted message == " + decryptmessage);
        if (decryptmessage.equals(BigInteger.valueOf(1))){
            return true;
        }
