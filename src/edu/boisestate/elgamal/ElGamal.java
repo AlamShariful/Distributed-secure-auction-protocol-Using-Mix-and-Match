@@ -40,7 +40,7 @@ public class ElGamal {
      */
     public static ElGamalMessage encryptMessage(ElGamalPublicKey publicKey, BigInteger message) {
         if (message.compareTo(publicKey.getP()) >= 0 || message.compareTo(BigInteger.ZERO) == 0) {
-            System.out.println("coming here");
+            //System.out.println("coming here");
             return null;
         }
 
@@ -73,7 +73,8 @@ public class ElGamal {
         BigInteger p = publicKey.getP();
 
         BigInteger maskingKey = encryptedMessage.getEphimeralKey().modPow(privateKey.getPrivateKey(), p);
-        BigInteger maskingKeyInverse = extendedEuclidAlgorithm(maskingKey, p).getT();
+        BigInteger maskingKeyInverse = extendedEuclidAlgorithm(p, maskingKey).getT();
+        maskingKeyInverse = maskingKeyInverse.mod(p);
         BigInteger message = encryptedMessage.getEncryptedMessage().multiply(maskingKeyInverse).mod(p);
 
         return message;
