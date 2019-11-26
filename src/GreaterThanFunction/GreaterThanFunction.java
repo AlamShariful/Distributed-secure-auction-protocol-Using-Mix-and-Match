@@ -1,18 +1,32 @@
 package GreaterThanFunction;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.math.BigInteger;
+import java.util.LinkedList;
+import java.util.Queue;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.logging.Level;
 
+import PET.CheckPET;
 import Tables.TableRow;
+import edu.boisestate.elgamal.ElGamal;
 import edu.boisestate.elgamal.ElGamalMessage;
+import edu.boisestate.elgamal.ElGamalPrivateKey;
+
+import static com.sun.xml.internal.ws.spi.db.BindingContextFactory.LOGGER;
 
 public class GreaterThanFunction
 {
     private TableRow[] tableRow;
     private ElGamalMessage encOfOne, encOfNegOne, encOfZeroAlt;
     private ElGamalMessage previousSign;
+    private CheckPET checkpet;
 
-    public GreaterThanFunction(ElGamalMessage mEncOfOne, ElGamalMessage mEncOfNegOne, ElGamalMessage mEncOfZeroAlt, ElGamalMessage mPreviousSign)
+    private FileWriter fileWriter;
+
+    public GreaterThanFunction(ElGamalMessage mEncOfOne, ElGamalMessage mEncOfNegOne, ElGamalMessage mEncOfZeroAlt, ElGamalMessage mPreviousSign) throws IOException
     {
         tableRow = new TableRow[12];
 
@@ -26,6 +40,11 @@ public class GreaterThanFunction
         encOfZeroAlt = mEncOfZeroAlt;
 
         previousSign = mPreviousSign;
+
+        checkpet = new CheckPET();
+
+        String path = System.getProperty("user.dir").toString() + "\\samplefile1.txt";
+        fileWriter = new FileWriter(path);
     }
 
     public void generateFullGreaterThanTable()
@@ -88,8 +107,8 @@ public class GreaterThanFunction
         System.out.println("A              B           sign         outA          outB");
         for(int i = 0; i < 12; i++)
         {
-            System.out.println(tableRow[i].getAi() + "         " + tableRow[i].getBi() + "         " + tableRow[i].getSign()
-                               + "         " + tableRow[i].getOutA() + "          " + tableRow[i].getOutB());
+            System.out.println(tableRow[i].getAi().getEncryptedMessage() + "         " + tableRow[i].getBi().getEncryptedMessage() + "         " + tableRow[i].getSign().getEncryptedMessage()
+                               + "         " + tableRow[i].getOutA().getEncryptedMessage() + "          " + tableRow[i].getOutB().getEncryptedMessage());
         }
     }
     public void ShuffleTable()
@@ -111,6 +130,74 @@ public class GreaterThanFunction
             tableRow[rand_int1] = tableRow[rand_int2];
             tableRow[rand_int2] = temp;
         }
+    }
+    public boolean CheckGreater(ElGamalMessage [] encNum1, ElGamalMessage [] encNum2, ElGamalPrivateKey privateKey) throws IOException
+    {
+        ElGamalMessage previousState = encOfZeroAlt;    //by default we assume that the numbers are equal
+        usingFileWriter("initial previous state == " + previousState + "\n");
+        //System.out.println("initial previous state == " + previousState);
+
+        for(int bitIndex = 0; bitIndex < 1024; bitIndex++)
+        {
+            usingFileWriter("checking bit no" + bitIndex + "\n");
+            //System.out.println("checking bit no" + bitIndex);
+            for(int tableIndex = 0; tableIndex < 12; tableIndex++)
+            {
+                /*if((encNum1[bitIndex].getEncryptedMessage().equals(tableRow[tableIndex].getAi().getEncryptedMessage()) && encNum1[bitIndex].getEphimeralKey().equals(tableRow[tableIndex].getAi().getEphimeralKey()))
+                   && (encNum2[bitIndex].getEncryptedMessage().equals(tableRow[tableIndex].getAi().getEncryptedMessage()) && encNum2[bitIndex].getEphimeralKey().equals(tableRow[tableIndex].getAi().getEphimeralKey()))
+                   && (previousState.getEncryptedMessage().equals(tableRow[tableIndex].getAi().getEncryptedMessage()) && previousState.getEphimeralKey().equals(tableRow[tableIndex].getAi().getEphimeralKey())))
+                {
+                    previousState = tableRow[tableIndex].getOutA();
+                    System.out.println("previous state == " + previousState);
+                }*/
+                usingFileWriter("checking with table bit Ai = " + ElGamal.decryptMessage(tableRow[tableIndex].getAi(), privateKey));
+                usingFileWriter("matching with bit = " + ElGamal.decryptMessage(encNum1[bitIndex], privateKey));
+
+                if(isBitMessageEqual(encNum1[bitIndex], tableRow[tableIndex].getAi(), privateKey))
+                {
+
+                    usingFileWriter("first col match" + "\n");
+                    //System.out.println("first col match");
+                    if(isBitMessageEqual(encNum2[bitIndex], tableRow[tableIndex].getBi(), privateKey))
+                    {
+                        usingFileWriter("second col match" + "\n");
+                        //System.out.println("second col match");
+                        if(isBitMessageEqual(previousState, tableRow[tableIndex].getSign(), privateKey))
+                        {
+                            previousState = tableRow[tableIndex].getOutA();
+                            usingFileWriter("\n\n\n");
+                            break;
+                            //System.out.println("previous state == " + previousState);
+                        }
+                    }
+                }
+            }
+        }
+
+        if(previousState.getEncryptedMessage().equals(encOfOne.getEncryptedMessage()) && previousState.getEphimeralKey().equals(encOfOne.getEphimeralKey()))
+        {
+            return  true;
+        }
+        return false;
+    }
+    public boolean isBitMessageEqual(ElGamalMessage m1, ElGamalMessage m2, ElGamalPrivateKey privateKey) throws IOException
+    {
+        boolean result = checkpet.checkEqualityOfTwoMessage(m1, m2, privateKey);
+
+        if(result)
+        {
+            usingFileWriter("pet returns true" + "\n");
+        }
+        else
+        {
+            usingFileWriter("pet returns false" + "\n");
+        }
+        return result;
+    }
+    public void usingFileWriter(String fileContent) throws IOException
+    {
+        fileWriter.write(fileContent);
+        //fileWriter.close();
     }
 
 }

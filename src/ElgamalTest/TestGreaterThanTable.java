@@ -4,21 +4,22 @@ import GreaterThanFunction.GreaterThanFunction;
 import PET.CheckPET;
 import edu.boisestate.elgamal.*;
 
+import java.io.IOException;
 import java.math.BigInteger;
 
 public class TestGreaterThanTable {
-    public static void main(String[] args)
+    public static void main(String[] args) throws IOException
     {
 
         ElGamalPrivateKey privateKey = ElGamal.generateKeyPair(20);
-        System.out.println("Test Private key == " + privateKey.getPrivateKey());
+        //System.out.println("Test Private key == " + privateKey.getPrivateKey());
 
         ElGamalPublicKey publicKey;
         publicKey = privateKey.getPublicKey();
 
-        System.out.println("Test private key G == " + publicKey.getG());
-        System.out.println("Test private key P == " + publicKey.getP());
-        System.out.println("Test private key B == " + publicKey.getB());
+        //System.out.println("Test private key G == " + publicKey.getG());
+        //System.out.println("Test private key P == " + publicKey.getP());
+        //System.out.println("Test private key B == " + publicKey.getB());
 
         //new let's test GreaterThanFunction
         //BigInteger one = BigInteger.ONE;
@@ -32,42 +33,53 @@ public class TestGreaterThanTable {
         //System.out.println("starting encryption:");
 
         encOne = ElGamal.encryptMessage(publicKey, one);
-        System.out.println("enc1 = " + encOne.getEncryptedMessage() + ", " + encOne.getEphimeralKey());
+        //System.out.println("enc1 = " + encOne.getEncryptedMessage() + ", " + encOne.getEphimeralKey());
         //System.out.println("done1");
 
         encZeroAlt = ElGamal.encryptMessage(publicKey, zeroAlt);
-        System.out.println("enc0alt = " + encZeroAlt.getEncryptedMessage() + ", " + encZeroAlt.getEphimeralKey());
+        //System.out.println("enc0alt = " + encZeroAlt.getEncryptedMessage() + ", " + encZeroAlt.getEphimeralKey());
         //System.out.println("done2");
 
         encNegOne = ElGamal.encryptMessage(publicKey, negOne);
-        System.out.println("encNeg1 = " + encNegOne.getEncryptedMessage() + ", " + encNegOne.getEphimeralKey());
+        //System.out.println("encNeg1 = " + encNegOne.getEncryptedMessage() + ", " + encNegOne.getEphimeralKey());
         //System.out.println("done3");
 
-        System.out.println("starting table generation test:");
+        //System.out.println("starting table generation test:");
         GreaterThanFunction greaterThanFunction = new GreaterThanFunction(encOne, encNegOne, encZeroAlt, encZeroAlt);   //sign is equal
         greaterThanFunction.generateFullGreaterThanTable();
         greaterThanFunction.PrintTable();
-        greaterThanFunction.ShuffleTable();
+        //greaterThanFunction.ShuffleTable();
         greaterThanFunction.PrintTable();
 
 
         //so table genration is done, now let's check if it works on cipher texts
         //getting two cipher text
-        BigInteger num1 = BigInteger.valueOf(10);
-        BigInteger num2 = BigInteger.valueOf(15);
+        BigInteger num1 = BigInteger.valueOf(15);
+        BigInteger num2 = BigInteger.valueOf(10);
 
         BitbyBitEncryptionTable binary = new BitbyBitEncryptionTable();
         String num1S = binary.binaryTostring(num1);
         String num2S = binary.binaryTostring(num2);
 
-        System.out.println("first value in binary: " + num1S);
-        System.out.println("Second value in binary: " + num2S);
+        //System.out.println("first value in binary: " + num1S);
+        //System.out.println("Second value in binary: " + num2S);
 
         ElGamalMessage [] encNum1= binary.splitstringAndencryption(num1S, publicKey);
         ElGamalMessage [] encNum2= binary.splitstringAndencryption(num2S, publicKey);
 
-        System.out.println(encNum1[0]);
-        //ElGamalMessage e1 = ElGamal.encryptMessage(publicKey, num1);
+        System.out.println(ElGamal.decryptMessage(encNum1[0], privateKey));
+        System.out.println(ElGamal.decryptMessage(encNum1[1], privateKey));
+        System.out.println(ElGamal.decryptMessage(encNum1[1020], privateKey));
+        System.out.println(ElGamal.decryptMessage(encNum1[1021], privateKey));
+        System.out.println(ElGamal.decryptMessage(encNum1[1022], privateKey));
+        System.out.println(ElGamal.decryptMessage(encNum1[1023], privateKey));
+        //I here have the bitwise encryption of two plain texts: 10, and 15. now let's see if we can use this
+        //along with my greater than table to figure out which one is bigger
+        boolean result = greaterThanFunction.CheckGreater(encNum1, encNum2, privateKey);
+        System.out.println("result == " + result);
+
+
+        /*//ElGamalMessage e1 = ElGamal.encryptMessage(publicKey, num1);
         //ElGamalMessage e2 = ElGamal.encryptMessage(publicKey, num2);
 
         //same enc test
@@ -106,6 +118,6 @@ public class TestGreaterThanTable {
         CheckPET checkpet = new CheckPET();
 
         boolean result = checkpet.checkEqualityOfTwoMessage(encNegOne, encNegOne, privateKey);
-        System.out.println("result == "  + result);
+        System.out.println("result == "  + result);*/
     }
 }
