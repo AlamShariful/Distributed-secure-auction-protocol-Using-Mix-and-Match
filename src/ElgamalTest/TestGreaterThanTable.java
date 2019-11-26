@@ -17,16 +17,16 @@ public class TestGreaterThanTable {
         ElGamalPublicKey publicKey;
         publicKey = privateKey.getPublicKey();
 
-        //System.out.println("Test private key G == " + publicKey.getG());
-        //System.out.println("Test private key P == " + publicKey.getP());
-        //System.out.println("Test private key B == " + publicKey.getB());
+        System.out.println("Test private key G == " + publicKey.getG());
+        System.out.println("Test private key P == " + publicKey.getP());
+        System.out.println("Test private key B == " + publicKey.getB());
 
         //new let's test GreaterThanFunction
         //BigInteger one = BigInteger.ONE;
         BigInteger one = BigInteger.valueOf(1);
         BigInteger negOne = publicKey.GetNegOneAlternative();    //just for test, assuming that we represent -1 with 2
         BigInteger zeroAlt = publicKey.GetZeroAlternative();    //just for test, assuming that we represent 0 with 50
-        System.out.println("onr = " + one + " and negOne = " + negOne);
+        //System.out.println("onr = " + one + " and negOne = " + negOne);
 
         ElGamalMessage encOne, encNegOne, encZeroAlt;
         //BigInteger encOne, encNegOne, encZeroAlt;
@@ -45,17 +45,18 @@ public class TestGreaterThanTable {
         //System.out.println("done3");
 
         //System.out.println("starting table generation test:");
-        GreaterThanFunction greaterThanFunction = new GreaterThanFunction(encOne, encNegOne, encZeroAlt, encZeroAlt);   //sign is equal
+        GreaterThanFunction greaterThanFunction = new GreaterThanFunction(encOne, encNegOne, encZeroAlt);   //sign is equal
         greaterThanFunction.generateFullGreaterThanTable();
         greaterThanFunction.PrintTable();
+        greaterThanFunction.PrintDecryptedTable(privateKey);
         //greaterThanFunction.ShuffleTable();
-        greaterThanFunction.PrintTable();
+        //greaterThanFunction.PrintTable();
 
 
         //so table genration is done, now let's check if it works on cipher texts
         //getting two cipher text
-        BigInteger num1 = BigInteger.valueOf(15);
-        BigInteger num2 = BigInteger.valueOf(10);
+        BigInteger num1 = BigInteger.valueOf(16);
+        BigInteger num2 = BigInteger.valueOf(15);
 
         BitbyBitEncryptionTable binary = new BitbyBitEncryptionTable();
         String num1S = binary.binaryTostring(num1);
@@ -67,18 +68,15 @@ public class TestGreaterThanTable {
         ElGamalMessage [] encNum1= binary.splitstringAndencryption(num1S, publicKey);
         ElGamalMessage [] encNum2= binary.splitstringAndencryption(num2S, publicKey);
 
-        System.out.println(ElGamal.decryptMessage(encNum1[0], privateKey));
-        System.out.println(ElGamal.decryptMessage(encNum1[1], privateKey));
-        System.out.println(ElGamal.decryptMessage(encNum1[1020], privateKey));
-        System.out.println(ElGamal.decryptMessage(encNum1[1021], privateKey));
-        System.out.println(ElGamal.decryptMessage(encNum1[1022], privateKey));
-        System.out.println(ElGamal.decryptMessage(encNum1[1023], privateKey));
         //I here have the bitwise encryption of two plain texts: 10, and 15. now let's see if we can use this
         //along with my greater than table to figure out which one is bigger
+        System.out.println("Checking the greater than function for the plain texts == " + num1 + ", " + num2);
         boolean result = greaterThanFunction.CheckGreater(encNum1, encNum2, privateKey);
         System.out.println("result == " + result);
 
-
+        //greaterThanFunction.PrintTable();
+        //greaterThanFunction.ShuffleTable();
+        //greaterThanFunction.PrintTable();
         /*//ElGamalMessage e1 = ElGamal.encryptMessage(publicKey, num1);
         //ElGamalMessage e2 = ElGamal.encryptMessage(publicKey, num2);
 
