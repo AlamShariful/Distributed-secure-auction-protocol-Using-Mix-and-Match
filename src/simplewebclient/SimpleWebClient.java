@@ -44,8 +44,12 @@ public class SimpleWebClient {
                 String s = binary.binaryTostring(userInput);
                 System.out.println("Binary form:"+s);
 
+                // Elgamal Key Generation
                 ElGamalPrivateKey privateKey = ElGamal.generateKeyPair(12);
                 System.out.println("Test Private key == " + privateKey.getPrivateKey());
+                // Moved inside Multiple_servers_interface
+
+
 
                 ElGamalPublicKey publicKey;
                 publicKey = privateKey.getPublicKey();
@@ -74,8 +78,8 @@ public class SimpleWebClient {
                 out.flush();
                 out.close();
 
-                ElGamalMessage m1= ElGamal.encryptMessage(publicKey,BigInteger.valueOf(1));
-                ElGamalMessage m2= ElGamal.encryptMessage(publicKey,BigInteger.valueOf(1));
+                ElGamalMessage m1= ElGamal.encryptMessage(publicKey,BigInteger.valueOf(10));
+                ElGamalMessage m2= ElGamal.encryptMessage(publicKey,BigInteger.valueOf(10));
 
                 CheckPET check=new CheckPET();
                 Boolean result =check.checkEqualityOfTwoMessage(m1,m2,privateKey);
