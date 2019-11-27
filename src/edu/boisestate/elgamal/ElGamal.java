@@ -80,6 +80,22 @@ public class ElGamal {
         return message;
     }
 
+    public static ElGamalMessage reEncryptMessage(ElGamalMessage encryptedMessage, ElGamalPublicKey publicKey)
+    {
+        BigInteger one = BigInteger.valueOf(1);
+        ElGamalMessage encOne = encryptMessage(publicKey, one);
+
+        BigInteger reEncryptedAlpha = encryptedMessage.getEncryptedMessage().multiply(encOne.getEncryptedMessage());
+        BigInteger reEncryptedBeta = encryptedMessage.getEphimeralKey().multiply(encOne.getEphimeralKey());
+
+        reEncryptedAlpha = reEncryptedAlpha.mod(publicKey.getP());
+        reEncryptedBeta = reEncryptedBeta.mod(publicKey.getP());
+
+        ElGamalMessage reEncryptedMessage = new ElGamalMessage(reEncryptedBeta, reEncryptedAlpha);
+
+        return reEncryptedMessage;
+    }
+
     public static BigIntegerPair extendedEuclidAlgorithm(BigInteger a, BigInteger b) {
         BigIntegerPair pair = new BigIntegerPair();
 

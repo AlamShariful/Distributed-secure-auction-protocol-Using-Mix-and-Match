@@ -49,13 +49,16 @@ public class TestGreaterThanTable {
         greaterThanFunction.generateFullGreaterThanTable();
         greaterThanFunction.PrintTable();
         greaterThanFunction.PrintDecryptedTable(privateKey);
+        greaterThanFunction.ReShuffleAndReEncryptTable(publicKey);
+        System.out.println("after reshuffle and reencryption:");
+        greaterThanFunction.PrintDecryptedTable(privateKey);
         //greaterThanFunction.ShuffleTable();
         //greaterThanFunction.PrintTable();
 
 
         //so table genration is done, now let's check if it works on cipher texts
         //getting two cipher text
-        BigInteger num1 = BigInteger.valueOf(16);
+        BigInteger num1 = BigInteger.valueOf(20);
         BigInteger num2 = BigInteger.valueOf(15);
 
         BitbyBitEncryptionTable binary = new BitbyBitEncryptionTable();
