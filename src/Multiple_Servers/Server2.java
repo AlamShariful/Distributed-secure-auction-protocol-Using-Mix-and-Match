@@ -10,16 +10,16 @@ public class Server2 {
         {
             // Create an object of the interface
             // implementation class
-            Elgamai_Interface_Implementation_call obj = new Elgamai_Interface_Implementation_call();
+            Elgamal_interface obj = new Elgamai_Interface_Implementation_call();
 
             // rmiregistry within the server JVM with
             // port number 1900
             LocateRegistry.createRegistry(1900);
 
             // Binds the remote object by the name
-            // geeksforgeeks
+            // privateKey
             Naming.rebind("rmi://localhost:1900"+
-                    "/geeksforgeeks",obj);
+                    "/privateKey",obj);
         }
         catch(Exception ae)
         {
