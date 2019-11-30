@@ -2,7 +2,7 @@ package edu.boisestate.elgamal;
 
 import java.math.BigInteger;
 
-public class ElGamalPublicKey {
+public class ElGamalPublicKey implements java.io.Serializable{
     private BigInteger p;
     private BigInteger g;
     private BigInteger B;
