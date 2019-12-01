@@ -11,7 +11,8 @@ public class TestGreaterThanTable {
     public static void main(String[] args) throws IOException
     {
 
-        ElGamalPrivateKey privateKey = ElGamal.generateKeyPair(20);
+        int bits = 20;
+        ElGamalPrivateKey privateKey = ElGamal.generateKeyPair(bits);
         //System.out.println("Test Private key == " + privateKey.getPrivateKey());
 
         ElGamalPublicKey publicKey;
@@ -58,7 +59,7 @@ public class TestGreaterThanTable {
 
         //so table genration is done, now let's check if it works on cipher texts
         //getting two cipher text
-        BigInteger num1 = BigInteger.valueOf(20);
+        BigInteger num1 = BigInteger.valueOf(22);
         BigInteger num2 = BigInteger.valueOf(15);
 
         BitbyBitEncryptionTable binary = new BitbyBitEncryptionTable();
