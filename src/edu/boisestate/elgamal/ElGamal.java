@@ -2,6 +2,7 @@ package edu.boisestate.elgamal;
 
 import java.math.BigInteger;
 import java.security.SecureRandom;
+import java.util.List;
 
 public class ElGamal {
 
@@ -19,7 +20,25 @@ public class ElGamal {
         BigInteger b = new BigInteger(bits, rnd);
         b = b.mod(p.subtract(BigInteger.valueOf(2))).add(BigInteger.valueOf(2)); // random value between 2 and p-2
         assert g != null;
-        System.err.println(g);
+        //System.err.println(g);
+        BigInteger B = g.modPow(b, p);
+        ElGamalPublicKey publicKey = new ElGamalPublicKey();
+        publicKey.setP(p);
+        publicKey.setG(g);
+        publicKey.setB(B);
+        ElGamalPrivateKey privateKey = new ElGamalPrivateKey();
+        privateKey.setPrivateKey(b);
+        privateKey.setPublicKey(publicKey);
+
+        return privateKey;
+    }
+    public static ElGamalPrivateKey generateKeyPair(int bits, BigInteger p, BigInteger g) {
+        //BigInteger p = generateSafePrime(bits);
+        //BigInteger g = generateRandomPrimitive(p);
+        BigInteger b = new BigInteger(bits, rnd);
+        b = b.mod(p.subtract(BigInteger.valueOf(2))).add(BigInteger.valueOf(2)); // random value between 2 and p-2
+        assert g != null;
+        //System.err.println(g);
         BigInteger B = g.modPow(b, p);
         ElGamalPublicKey publicKey = new ElGamalPublicKey();
         publicKey.setP(p);
@@ -79,6 +98,32 @@ public class ElGamal {
 
         return message;
     }
+    public static ElGamalMessage decryptDistributedMessage(ElGamalMessage encryptedMessage, List<ElGamalPrivateKey> privateKeys) {
+        ElGamalMessage result = encryptedMessage;
+
+        for(int i=0;i<privateKeys.size();i++)
+        {
+            result = decryptGroupMessage(result, privateKeys.get(i));
+        }
+        return result;
+    }
+
+
+    public static ElGamalMessage decryptGroupMessage(ElGamalMessage encryptedMessage, ElGamalPrivateKey privateKey) {
+        ElGamalPublicKey publicKey = privateKey.getPublicKey();
+        BigInteger p = publicKey.getP();
+
+        BigInteger maskingKey = encryptedMessage.getEphimeralKey().modPow(privateKey.getPrivateKey(), p);
+        BigInteger maskingKeyInverse = extendedEuclidAlgorithm(p, maskingKey).getT();
+        maskingKeyInverse = maskingKeyInverse.mod(p);
+        BigInteger message = encryptedMessage.getEncryptedMessage().multiply(maskingKeyInverse).mod(p);
+
+        ElGamalMessage mPrime = new ElGamalMessage(encryptedMessage.getEphimeralKey(),message);
+
+        return mPrime;
+    }
+
+
 
     public static ElGamalMessage reEncryptMessage(ElGamalMessage encryptedMessage, ElGamalPublicKey publicKey)
     {
@@ -94,6 +139,30 @@ public class ElGamal {
         ElGamalMessage reEncryptedMessage = new ElGamalMessage(reEncryptedBeta, reEncryptedAlpha);
 
         return reEncryptedMessage;
+    }
+    public static ElGamalPublicKey getGroupPublicKey(List<ElGamalPublicKey> publicKeys)
+    {
+        System.out.println("size == " + publicKeys.size());
+        System.out.println("Param: " + publicKeys.get(0).getB());
+        System.out.println("Param: " + publicKeys.get(1).getB());
+
+        BigInteger groupB = BigInteger.ONE;
+        for(int i=0;i<publicKeys.size();i++)
+        {
+            groupB = groupB.multiply(publicKeys.get(i).getB());
+            System.out.println("gB = " + groupB);
+        }
+        groupB = groupB.mod(publicKeys.get(0).getP());
+        System.out.println("Finally gB = " + groupB);
+        BigInteger groupP = publicKeys.get(0).getP();
+        BigInteger groupG = publicKeys.get(0).getG();
+        System.out.println("gP = " + groupP);
+        ElGamalPublicKey groupPublicKey = new ElGamalPublicKey();
+        groupPublicKey.setP(groupP);
+        groupPublicKey.setG(groupG);
+        groupPublicKey.setB(groupB);
+
+        return groupPublicKey;
     }
 
     public static BigIntegerPair extendedEuclidAlgorithm(BigInteger a, BigInteger b) {
