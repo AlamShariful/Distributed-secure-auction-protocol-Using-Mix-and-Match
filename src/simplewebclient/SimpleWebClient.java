@@ -16,6 +16,10 @@ public class SimpleWebClient {
         try (
                 Socket serverSocket = new Socket(hostName, PORT);
 
+                // read Commonpublic Key from Server
+                DataInputStream dis = new DataInputStream(serverSocket.getInputStream());
+                //
+
                 // Read user input from console
                 BufferedReader stdIn =new BufferedReader(new InputStreamReader(System.in));
 
@@ -23,12 +27,20 @@ public class SimpleWebClient {
                 DataOutputStream out = new DataOutputStream(serverSocket.getOutputStream());
 
 
-                // Read server response from socket
-                //BufferedReader in =new BufferedReader(new InputStreamReader(serverSocket.getInputStream()));
+
         ) {
+
+            //Read commom Public Key from server
+            String commonPublicKey = (String) dis.readUTF();
+            BigInteger Common_publicKey= new BigInteger(commonPublicKey);
+            System.out.println("Common Public Key "+ Common_publicKey);
+
+            //convert Biginteger to specific class type
+            ElGamalPublicKey publicKey= new ElGamalPublicKey();
+            publicKey= (ElGamalPublicKey)Common_publicKey;
+
+
             //String userInput;
-
-
             // Read Biginteger input from client
             BigInteger userInput;
             Scanner sc = new Scanner(System.in);
@@ -44,6 +56,12 @@ public class SimpleWebClient {
                 String s = binary.binaryTostring(userInput);
                 System.out.println("Binary form:"+s);
 
+                /*
+                Following Section is taken care of inside the server 1/2/3
+                */
+
+                /*
+
                 // Elgamal Key Generation
                 ElGamalPrivateKey privateKey = ElGamal.generateKeyPair(12);
                 System.out.println("Test Private key == " + privateKey.getPrivateKey());
@@ -58,7 +76,14 @@ public class SimpleWebClient {
                 System.out.println("Test private key P == " + publicKey.getP());
                 System.out.println("Test private key B == " + publicKey.getB());
 
+
+
+
+
+                END */
+
                 // split string bit by bit and Encrypt each bit
+                //ElGamalMessage [] getInputTable= binary.splitstringAndencryption(s, publicKey);
                 ElGamalMessage [] getInputTable= binary.splitstringAndencryption(s, publicKey);
 
                 for (int i=0; i<getInputTable.length;i++){
@@ -77,6 +102,10 @@ public class SimpleWebClient {
                 out.writeUTF(ciphertext);
                 out.flush();
                 out.close();
+
+
+
+                // Everything in the bottom should go the server
 
                 ElGamalMessage m1= ElGamal.encryptMessage(publicKey,BigInteger.valueOf(10));
                 ElGamalMessage m2= ElGamal.encryptMessage(publicKey,BigInteger.valueOf(10));

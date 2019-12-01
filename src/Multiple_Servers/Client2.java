@@ -8,9 +8,6 @@ import java.rmi.Naming;
 public class Client2 {
     public static void main(String args[])
     {
-        //String answer,value="Reflection in Java";
-        //String answer2 = "Call other";
-        //BigInteger answer;
         ElGamalPrivateKey answer;
         String value="get_privateKey";
         try
@@ -23,7 +20,7 @@ public class Client2 {
             //answer2 = privateKey.query2(answer2);
             //System.out.println("From Elgamal_Interface__Implementation_call Private Key: "+answer);
             System.out.println("From Elgamal_Interface__Implementation_call Private Key: "+answer.getPrivateKey());
-            System.out.println("From Elgamal_Interface__Implementation_call Public Key: "+answer.getPublicKey());
+            System.out.println("From Elgamal_Interface__Implementation_call Public Key: "+answer.getPublicKey().getG());
         }
         catch(Exception ae)
         {

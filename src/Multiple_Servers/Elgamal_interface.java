@@ -12,8 +12,6 @@ import edu.boisestate.elgamal.*;
 public interface Elgamal_interface extends Remote {
 
     public ElGamalPrivateKey generate_privatekey(String search_privateKey) throws RemoteException;
-    //public BigInteger generate_privatekey(String search_privateKey) throws RemoteException;
-    public BigInteger generate_publicekey(String search_publicKey) throws RemoteException;
-    public BigInteger[] generate_keypair(String search_keypair) throws RemoteException;
+    public BigInteger decrypt_messege (ElGamalMessage msg, ElGamalPrivateKey privatekey, String decrypt_msg) throws RemoteException;
 
 }
