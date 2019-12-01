@@ -98,6 +98,15 @@ public class ElGamal {
 
         return message;
     }
+    public static ElGamalMessage decryptDistributedMessage(ElGamalMessage encryptedMessage, List<ElGamalPrivateKey> privateKeys) {
+        ElGamalMessage result = encryptedMessage;
+
+        for(int i=0;i<privateKeys.size();i++)
+        {
+            result = decryptGroupMessage(result, privateKeys.get(i));
+        }
+        return result;
+    }
 
 
     public static ElGamalMessage decryptGroupMessage(ElGamalMessage encryptedMessage, ElGamalPrivateKey privateKey) {

@@ -1,5 +1,6 @@
 package ElgamalTest;
 
+import GreaterThanFunction.GreaterThanFunction;
 import edu.boisestate.elgamal.*;
 
 import java.math.BigInteger;
@@ -37,20 +38,60 @@ public class TestDistributedElGamal
 
         System.out.println("Encrypt sample message in a simple way");
 
-        BitbyBitEncryptionTable binary = new BitbyBitEncryptionTable();
-
         BigInteger m = BigInteger.valueOf(16);
         System.out.println("Encrypting: " + m);
         ElGamalMessage encMessage = ElGamal.encryptMessage(globalPublicKey, m);
         System.out.println("Encrypted message: " + encMessage.getEncryptedMessage() + ", " + encMessage.getEphimeralKey());
 
-        System.out.println("Decrypting the grouped encrypted message:");
-        ElGamalMessage mPrime = ElGamal.decryptGroupMessage(encMessage, privateKey1);
-        System.out.println("after decrypting once: " + mPrime.getEncryptedMessage() + ", " + mPrime.getEphimeralKey());
+        List<ElGamalPrivateKey> list1=new ArrayList<ElGamalPrivateKey>();
+        list1.add(privateKey1);
+        list1.add(privateKey2);
 
-        ElGamalMessage message = ElGamal.decryptGroupMessage(mPrime, privateKey2);
-        System.out.println("after decrypting twice: " + message.getEncryptedMessage() + ", " + message.getEphimeralKey());
+        System.out.println("first key: private: " + privateKey1.getPrivateKey() + ", P: " + privateKey1.getPublicKey().getP() + ", G: " + privateKey1.getPublicKey().getG() + ", B: " + privateKey1.getPublicKey().getB());
+        System.out.println("second key: private: " + privateKey2.getPrivateKey() + ", P: " + privateKey2.getPublicKey().getP() + ", G: " + privateKey2.getPublicKey().getG() + ", B: " + privateKey2.getPublicKey().getB());
 
-        System.out.println("Full Decrypted message: " + message.getEncryptedMessage());
+        BigInteger message = ElGamal.decryptDistributedMessage(encMessage, list1).getEncryptedMessage();
+
+        System.out.println("Full Decrypted message: " + message);
+
+
+        //Greater than table generation test
+        BigInteger one = BigInteger.valueOf(1);
+        BigInteger negOne = globalPublicKey.GetNegOneAlternative();    //just for test, assuming that we represent -1 with 2
+        BigInteger zeroAlt = globalPublicKey.GetZeroAlternative();    //just for test, assuming that we represent 0 with 50
+        ElGamalMessage encOne, encNegOne, encZeroAlt;
+
+        encOne = ElGamal.encryptMessage(globalPublicKey, one);
+        encZeroAlt = ElGamal.encryptMessage(globalPublicKey, zeroAlt);
+        encNegOne = ElGamal.encryptMessage(globalPublicKey, negOne);
+
+        GreaterThanFunction greaterThanFunction = new GreaterThanFunction(encOne, encNegOne, encZeroAlt);   //sign is equal
+        greaterThanFunction.generateFullGreaterThanTable();
+        greaterThanFunction.PrintTable();
+        greaterThanFunction.ReShuffleAndReEncryptTable(globalPublicKey);
+        greaterThanFunction.PrintTable();
+
+
+        greaterThanFunction.PrintGroupDecryptedTable(list1);
+
+
+        //Testing greater than table and PET
+        System.out.println("testing PET");
+        BigInteger num1 = BigInteger.valueOf(3);
+        BigInteger num2 = BigInteger.valueOf(1);
+
+        BitbyBitEncryptionTable binary = new BitbyBitEncryptionTable();
+        String num1S = binary.binaryTostring(num1);
+        String num2S = binary.binaryTostring(num2);
+
+        //System.out.println("first value in binary: " + num1S);
+        //System.out.println("Second value in binary: " + num2S);
+
+        ElGamalMessage [] encNum1= binary.splitstringAndencryption(num1S, globalPublicKey);
+        ElGamalMessage [] encNum2= binary.splitstringAndencryption(num2S, globalPublicKey);
+
+        System.out.println("Checking the greater than function for the plain texts == " + num1 + ", " + num2);
+        boolean result = greaterThanFunction.CheckDistributedGreater(encNum1, encNum2, list1);
+        System.out.println("result == " + result);
     }
 }
