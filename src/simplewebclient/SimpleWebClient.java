@@ -12,32 +12,33 @@ import edu.boisestate.elgamal.*;
 public class SimpleWebClient {
     private static final String hostName = "localhost";
     private static final int PORT = 8089;
+
+
     public static void main(String[] args) throws IOException {
         try (
                 Socket serverSocket = new Socket(hostName, PORT);
 
-                // read Commonpublic Key from Server
-                DataInputStream dis = new DataInputStream(serverSocket.getInputStream());
-                //
+                /*
+                Try to Read Input Stream From Server Via Object Stream.
+                Read Commonpublic Key from Server
+                * */
+                InputStream inputStream = serverSocket.getInputStream();
+
+                // create a DataInputStream so we can read data from it.
+                ObjectInputStream objectInputStream = new ObjectInputStream(inputStream);
+
+                //END
 
                 // Read user input from console
                 BufferedReader stdIn =new BufferedReader(new InputStreamReader(System.in));
 
                 //Send user command to Server Via socket
                 DataOutputStream out = new DataOutputStream(serverSocket.getOutputStream());
-
-
-
         ) {
 
             //Read commom Public Key from server
-            String commonPublicKey = (String) dis.readUTF();
-            BigInteger Common_publicKey= new BigInteger(commonPublicKey);
-            System.out.println("Common Public Key "+ Common_publicKey);
-
-            //convert Biginteger to specific class type
-            ElGamalPublicKey publicKey= new ElGamalPublicKey();
-            publicKey= (ElGamalPublicKey)Common_publicKey;
+            ElGamalPublicKey publicKey = (ElGamalPublicKey) objectInputStream.readObject();
+            System.out.println("Elgamal Object, Public Key: "+ publicKey.getG());
 
 
             //String userInput;
@@ -57,7 +58,7 @@ public class SimpleWebClient {
                 System.out.println("Binary form:"+s);
 
                 /*
-                Following Section is taken care of inside the server 1/2/3
+                Following Section is taken care of inside get Common Public Key Function
                 */
 
                 /*
@@ -81,6 +82,7 @@ public class SimpleWebClient {
 
 
                 END */
+
 
                 // split string bit by bit and Encrypt each bit
                 //ElGamalMessage [] getInputTable= binary.splitstringAndencryption(s, publicKey);
@@ -106,6 +108,11 @@ public class SimpleWebClient {
 
 
                 // Everything in the bottom should go the server
+                //Current Implementation is Showing False because, I'm generating a new private Key
+                // Using BElow line, Remove it
+
+                // Remove Following Line
+                ElGamalPrivateKey privateKey = ElGamal.generateKeyPair(12);
 
                 ElGamalMessage m1= ElGamal.encryptMessage(publicKey,BigInteger.valueOf(10));
                 ElGamalMessage m2= ElGamal.encryptMessage(publicKey,BigInteger.valueOf(10));
@@ -167,6 +174,8 @@ public class SimpleWebClient {
         } catch (IOException e) {
             System.err.println("Couldn't get I/O for the connection to " +  hostName);
             System.exit(1);
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
         }
     }
 }

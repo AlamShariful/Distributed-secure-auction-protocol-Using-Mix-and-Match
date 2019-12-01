@@ -1,5 +1,6 @@
 package simplewebserver;
 
+
 import Multiple_Servers.Elgamal_interface;
 import Test_RMI_Multiple_Server.Search;
 import Test_RMI_Multiple_Server.SearchQuery;
@@ -15,42 +16,81 @@ import java.nio.file.*;
 import java.rmi.Naming;
 import java.rmi.registry.LocateRegistry;
 import java.util.*;
+import com.google.gson.*;
 
 public class SimpleWebServer {
 
     /* Run the HTTP server on this TCP port. */
     private static final int PORT = 8089;
-    private static BigInteger server1_publicKey,server2_publicKey, server3_publicKey,server1_privateKey,server2_privateKey,server3_privateKey;
+    //private static BigInteger server1_publicKey,server2_publicKey, server3_publicKey,server1_privateKey,server2_privateKey,server3_privateKey;
+    private static ElGamalPublicKey server1_publicKey,server2_publicKey, server3_publicKey,commonPublicKey;
+    private static ElGamalPrivateKey server1_privateKey,server2_privateKey,server3_privateKey;
+    public static String msg_Client1,msg_Client2,msg_Client3,msg_Client4;
 
+    public static int i=0;
     /* The socket used to process incoming connections from web clients */
     private static ServerSocket dServerSocket;
+
+    //List for Holding Grouppublic key
+    List<ElGamalPublicKey> groupPublicKey = new ArrayList<ElGamalPublicKey>();
 
     public SimpleWebServer () throws Exception {
         dServerSocket = new ServerSocket (PORT);
         getting_publicKey_For_This_server();
         getting_publicKey_From_server2();
         getting_publicKey_From_server3();
+
+        //get Group Public Key
+        commonPublicKey=ElGamal.getGroupPublicKey(groupPublicKey);
     }
 
     public void run() throws Exception {
-        while (true) {
 
+        // We are Condidering 4 Client, therefore this loop should Run 4 time (Connect 4 client)
+
+        //while (true) {
+        while (i<4) {
             try{
                 /* wait for a connection from a client */
                 Socket s = dServerSocket.accept();
-                System.out.println("Client Connected");
+                System.out.println("Client: "+Integer.sum(i,1)+" Connected");
 
-                //Send common publicKey to Client Via socket
-                DataOutputStream out = new DataOutputStream(s.getOutputStream());
-
-                //Change server1_publicKey with common publicKey and convert BigInteger to String
-                out.writeUTF(server1_publicKey.toString());
-                out.flush();
+                // Send output stream Object Via the socket. To client
+                OutputStream outputStream = s.getOutputStream();
+                ObjectOutputStream obj =new ObjectOutputStream(outputStream);
+                obj.writeObject(commonPublicKey);
 
                 // read Encrypted messege from User
                 DataInputStream dis=new DataInputStream(s.getInputStream());
                 String  str=(String)dis.readUTF();
-                System.out.println("Encrypted Message from Client= "+str);
+
+
+                //Assign Received Strings to Different Variables
+                if(i==0){
+                    // Client 1 is sending Msg
+                    msg_Client1=str;
+                    System.out.println("Encrypted Message= "+str);
+                }
+                if(i==1){
+                    // Client 2 is sending Msg
+                    msg_Client2=str;
+                    System.out.println("Encrypted Message= "+str);
+                }
+                if(i==2){
+                    // Client 3 is sending Msg
+                    msg_Client3=str;
+                    System.out.println("Encrypted Message= "+str);
+                }
+                if(i==3){
+                    // Client 4 is sending Msg
+                    msg_Client4=str;
+                    System.out.println("Encrypted Message= "+str);
+                }
+
+
+                //Count Connected Client
+                i++;
+
 
 
             }catch (Exception e){System.out.println(e);}
@@ -67,14 +107,18 @@ public class SimpleWebServer {
         privateKey = ElGamal.generateKeyPair(12);
 
         //private key
-        server1_privateKey=privateKey.getPrivateKey();
+        //server1_privateKey=privateKey.getPrivateKey();
+        server1_privateKey=privateKey;
 
         //get public key
-        server1_publicKey= privateKey.getPublicKey().getG();
+        server1_publicKey= privateKey.getPublicKey();
+
+        // add this public key to groupPublicKey list
+        groupPublicKey.add(server1_publicKey);
 
 
-        System.out.println("Server 1 Private Key: "+server1_privateKey);
-        System.out.println("Server 1 Public key: "+server1_publicKey);
+        System.out.println("Server 1 Private Key: "+server1_privateKey.getPrivateKey());
+        System.out.println("Server 1 Public key: "+server1_publicKey.getG());
 
     }
 
@@ -91,14 +135,17 @@ public class SimpleWebServer {
             answer = privateKey1.generate_privatekey(value);
 
             // server 2 key pair
-            server2_publicKey=answer.getPublicKey().getG();
-            server2_privateKey=answer.getPrivateKey();
+            server2_publicKey=answer.getPublicKey();
+            server2_privateKey=answer;
+
+            // add this public key to groupPublicKey list
+            groupPublicKey.add(server2_publicKey);
 
             //System.out.println("From Elgamal_Interface__Implementation_call Private Key: "+answer.getPrivateKey());
             //System.out.println("From Elgamal_Interface__Implementation_call Public Key: "+answer.getPublicKey().getG());
 
-            System.out.println("Server 2 Private Key: "+server2_privateKey);
-            System.out.println("Server 2 Public key: "+server2_publicKey);
+            System.out.println("Server 2 Private Key: "+server2_privateKey.getPrivateKey());
+            System.out.println("Server 2 Public key: "+server2_publicKey.getG());
         }
         catch(Exception ae)
         {
@@ -118,14 +165,17 @@ public class SimpleWebServer {
             answer = privateKey1.generate_privatekey(value);
 
             // server 3 keypair
-            server3_publicKey=answer.getPublicKey().getG();
-            server3_privateKey=answer.getPrivateKey();
+            server3_publicKey=answer.getPublicKey();
+            server3_privateKey=answer;
+
+            // add this public key to groupPublicKey list
+            groupPublicKey.add(server3_publicKey);
 
             //System.out.println("From Elgamal_Interface__Implementation_call Private Key: "+answer.getPrivateKey());
             //System.out.println("From Elgamal_Interface__Implementation_call Public Key: "+answer.getPublicKey().getG());
 
-            System.out.println("Server 3 Private Key: "+server3_privateKey);
-            System.out.println("Server 3 Public key: "+server3_publicKey);
+            System.out.println("Server 3 Private Key: "+server3_privateKey.getPrivateKey());
+            System.out.println("Server 3 Public key: "+server3_publicKey.getG());
         }
         catch(Exception ae)
         {
@@ -139,8 +189,6 @@ public class SimpleWebServer {
     public static void main (String argv[]) throws Exception {
         /* Create a SimpleWebServer object, and run it */
         SimpleWebServer sws = new SimpleWebServer();
-
-        // run function to get a common public key
 
         // run the coordinator server (this server)
         sws.run();
