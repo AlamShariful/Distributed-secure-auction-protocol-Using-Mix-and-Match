@@ -22,7 +22,7 @@ public class Elgamai_Interface_Implementation_call extends UnicastRemoteObject i
 
     @Override
     //public BigInteger generate_privatekey(String search_privateKey) throws RemoteException{
-    public ElGamalPrivateKey generate_privatekey(String search_privateKey) throws RemoteException{
+    public ElGamalPrivateKey generate_privatekey(String search_privateKey, int bits, BigInteger p, BigInteger g) throws RemoteException{
         // return Elgamal Private key
         BigInteger result=null;
         ElGamalPrivateKey privateKey= new ElGamalPrivateKey();
@@ -30,13 +30,13 @@ public class Elgamai_Interface_Implementation_call extends UnicastRemoteObject i
         if(search_privateKey.equals("get_privateKey")){
 
             //call Elgamal package to get private key
-            privateKey = ElGamal.generateKeyPair(12);
+            privateKey = ElGamal.generateKeyPair(bits, p, g);
             result = privateKey.getPrivateKey();
             System.out.println("Private Key: "+result);
 
             //get public key
             publicKey = privateKey.getPublicKey();
-            System.out.println("Public key: "+publicKey);
+            System.out.println("Public key: "+publicKey.getP()+","+publicKey.getG()+","+publicKey.getB());
         }
         //return result;
         return privateKey;

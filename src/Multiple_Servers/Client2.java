@@ -16,7 +16,11 @@ public class Client2 {
             Elgamal_interface privateKey1 =
                     (Elgamal_interface) Naming.lookup("rmi://localhost:1900"+
                             "/privateKey");
-            answer = privateKey1.generate_privatekey(value);
+            int bits = 20;
+            BigInteger p = ElGamal.generateSafePrime(bits);
+            BigInteger g = ElGamal.generateRandomPrimitive(p);
+
+            answer = privateKey1.generate_privatekey(value, bits, p, g);
             //answer2 = privateKey.query2(answer2);
             //System.out.println("From Elgamal_Interface__Implementation_call Private Key: "+answer);
             System.out.println("From Elgamal_Interface__Implementation_call Private Key: "+answer.getPrivateKey());

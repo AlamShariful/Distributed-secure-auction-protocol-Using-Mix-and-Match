@@ -5,8 +5,10 @@ import Multiple_Servers.Elgamal_interface;
 import Test_RMI_Multiple_Server.Search;
 import Test_RMI_Multiple_Server.SearchQuery;
 import edu.boisestate.elgamal.ElGamal;
+import edu.boisestate.elgamal.ElGamalMessage;
 import edu.boisestate.elgamal.ElGamalPrivateKey;
 import edu.boisestate.elgamal.ElGamalPublicKey;
+import otherFunctions.ElGamalBitMessageConversion;
 
 import java.io.*;
 import java.math.BigInteger;
@@ -16,7 +18,7 @@ import java.nio.file.*;
 import java.rmi.Naming;
 import java.rmi.registry.LocateRegistry;
 import java.util.*;
-import com.google.gson.*;
+//import com.google.gson.*;
 
 public class SimpleWebServer {
 
@@ -28,6 +30,10 @@ public class SimpleWebServer {
     public static String msg_Client1,msg_Client2,msg_Client3,msg_Client4;
 
     public static int i=0;
+
+    private int bits = 20;
+    private BigInteger p = ElGamal.generateSafePrime(bits);
+    private BigInteger g = ElGamal.generateRandomPrimitive(p);
     /* The socket used to process incoming connections from web clients */
     private static ServerSocket dServerSocket;
 
@@ -41,6 +47,7 @@ public class SimpleWebServer {
         getting_publicKey_From_server3();
 
         //get Group Public Key
+        System.out.println("generating group public key: " + groupPublicKey.size());
         commonPublicKey=ElGamal.getGroupPublicKey(groupPublicKey);
     }
 
@@ -69,7 +76,14 @@ public class SimpleWebServer {
                 if(i==0){
                     // Client 1 is sending Msg
                     msg_Client1=str;
-                    System.out.println("Encrypted Message= "+str);
+                    ElGamalMessage [] bitMsg_client1 = ElGamalBitMessageConversion.StringToElgamalBitMessage(str);
+                    System.out.println("Encrypted Message= ");
+
+                    for(int i=0;i<bitMsg_client1.length;i++)
+                    {
+                        System.out.print(bitMsg_client1[i].getEphimeralKey()+","+bitMsg_client1[i].getEncryptedMessage()+".");
+                    }
+                    System.out.print("\n");
                 }
                 if(i==1){
                     // Client 2 is sending Msg
@@ -95,6 +109,7 @@ public class SimpleWebServer {
 
             }catch (Exception e){System.out.println(e);}
         }
+        System.out.println("4 messages collected. Messages are: \n" + msg_Client1 + "\n" + msg_Client2 + "\n"+ msg_Client3 + "\n"+ msg_Client4 + "\n");
     }
 
     // calling remote server to additional support
@@ -104,7 +119,7 @@ public class SimpleWebServer {
 
 
         //call Elgamal package to get private key
-        privateKey = ElGamal.generateKeyPair(12);
+        privateKey = ElGamal.generateKeyPair(bits, p, g);
 
         //private key
         //server1_privateKey=privateKey.getPrivateKey();
@@ -118,7 +133,7 @@ public class SimpleWebServer {
 
 
         System.out.println("Server 1 Private Key: "+server1_privateKey.getPrivateKey());
-        System.out.println("Server 1 Public key: "+server1_publicKey.getG());
+        System.out.println("Server 1 Public key: "+server1_publicKey.getP()+","+server1_publicKey.getG()+","+server1_publicKey.getB());
 
     }
 
@@ -132,7 +147,7 @@ public class SimpleWebServer {
                     (Elgamal_interface) Naming.lookup("rmi://localhost:1900"+
                             "/privateKey");
 
-            answer = privateKey1.generate_privatekey(value);
+            answer = privateKey1.generate_privatekey(value, bits, p, g);
 
             // server 2 key pair
             server2_publicKey=answer.getPublicKey();
@@ -145,7 +160,7 @@ public class SimpleWebServer {
             //System.out.println("From Elgamal_Interface__Implementation_call Public Key: "+answer.getPublicKey().getG());
 
             System.out.println("Server 2 Private Key: "+server2_privateKey.getPrivateKey());
-            System.out.println("Server 2 Public key: "+server2_publicKey.getG());
+            System.out.println("Server 2 Public key: "+server2_publicKey.getP()+","+server2_publicKey.getG()+","+server2_publicKey.getB());
         }
         catch(Exception ae)
         {
@@ -162,7 +177,7 @@ public class SimpleWebServer {
             Elgamal_interface privateKey1 =
                     (Elgamal_interface) Naming.lookup("rmi://localhost:2000"+
                             "/privateKey");
-            answer = privateKey1.generate_privatekey(value);
+            answer = privateKey1.generate_privatekey(value, bits, p, g);
 
             // server 3 keypair
             server3_publicKey=answer.getPublicKey();
@@ -175,7 +190,7 @@ public class SimpleWebServer {
             //System.out.println("From Elgamal_Interface__Implementation_call Public Key: "+answer.getPublicKey().getG());
 
             System.out.println("Server 3 Private Key: "+server3_privateKey.getPrivateKey());
-            System.out.println("Server 3 Public key: "+server3_publicKey.getG());
+            System.out.println("Server 3 Public key: "+server3_publicKey.getP()+","+server3_publicKey.getG()+","+server3_publicKey.getB());
         }
         catch(Exception ae)
         {
