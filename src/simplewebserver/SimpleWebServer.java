@@ -20,7 +20,7 @@ import java.rmi.registry.LocateRegistry;
 import java.util.*;
 //import com.google.gson.*;
 
-public class SimpleWebServer {
+public class SimpleWebServer{
 
     /* Run the HTTP server on this TCP port. */
     private static final int PORT = 8089;

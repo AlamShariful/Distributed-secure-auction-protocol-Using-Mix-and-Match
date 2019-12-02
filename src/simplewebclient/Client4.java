@@ -1,18 +1,17 @@
 package simplewebclient;
 
-import java.io.*;
-import java.math.BigInteger;
-import java.net.*;
-import java.util.Scanner;
-
 import PET.CheckPET;
 import edu.boisestate.elgamal.*;
 
+import java.io.*;
+import java.math.BigInteger;
+import java.net.Socket;
+import java.net.UnknownHostException;
+import java.util.Scanner;
 
-public class SimpleWebClient extends Thread{
+public class Client4 extends Thread{
     private static final String hostName = "localhost";
     private static final int PORT = 8089;
-
 
     public static void main(String[] args) throws IOException {
         try (
@@ -86,7 +85,7 @@ public class SimpleWebClient extends Thread{
 
                 // split string bit by bit and Encrypt each bit
                 //ElGamalMessage [] getInputTable= binary.splitstringAndencryption(s, publicKey);
-                ElGamalMessage [] getInputTable= binary.splitstringAndencryption(s, publicKey);
+                ElGamalMessage[] getInputTable= binary.splitstringAndencryption(s, publicKey);
 
                 for (int i=0; i<getInputTable.length;i++){
                     System.out.println("Table Output"+getInputTable[i].getEncryptedMessage() + " , " + getInputTable[i].getEphimeralKey());
@@ -150,7 +149,7 @@ public class SimpleWebClient extends Thread{
 
                 //second try ends
                 /* Trying to use Elgamal, Testing failed
-                
+
                 // take user input and encrypt with elgamal
                 ElGamalPrivateKey privateKey = ElGamal.generateKeyPair(1024);
                 System.out.println("Elgamal Private Key:"+privateKey);
@@ -178,4 +177,5 @@ public class SimpleWebClient extends Thread{
             e.printStackTrace();
         }
     }
+
 }
