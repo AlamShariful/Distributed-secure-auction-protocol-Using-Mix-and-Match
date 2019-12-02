@@ -7,6 +7,7 @@ import java.util.Scanner;
 
 import PET.CheckPET;
 import edu.boisestate.elgamal.*;
+import otherFunctions.ElGamalBitMessageConversion;
 
 
 public class SimpleWebClient extends Thread{
@@ -38,7 +39,7 @@ public class SimpleWebClient extends Thread{
 
             //Read commom Public Key from server
             ElGamalPublicKey publicKey = (ElGamalPublicKey) objectInputStream.readObject();
-            System.out.println("Elgamal Object, Public Key: "+ publicKey.getG());
+            System.out.println("Elgamal Object, Public Key: " + publicKey.getP() + "," + publicKey.getG() + "," + publicKey.getB());
 
 
             //String userInput;
@@ -88,19 +89,10 @@ public class SimpleWebClient extends Thread{
                 //ElGamalMessage [] getInputTable= binary.splitstringAndencryption(s, publicKey);
                 ElGamalMessage [] getInputTable= binary.splitstringAndencryption(s, publicKey);
 
-                for (int i=0; i<getInputTable.length;i++){
-                    System.out.println("Table Output"+getInputTable[i].getEncryptedMessage() + " , " + getInputTable[i].getEphimeralKey());
-                    //ciphertext=ciphertext.concat(getInputTable[i].toString());
-                    if (ciphertext == ""){
-                        ciphertext=getInputTable[i].getEncryptedMessage().toString() + "," + getInputTable[i].getEphimeralKey().toString();
-                    }else{
-                        ciphertext=ciphertext +"."+getInputTable[i].getEncryptedMessage().toString() + "," + getInputTable[i].getEphimeralKey().toString();
-                    }
-
-                    System.out.println("Ciphertext"+ciphertext);
-                }
+                ciphertext = ElGamalBitMessageConversion.ElgamalBitMessageToString(getInputTable);
 
                 // Sending Cipher text to Server
+                System.out.println("sending bits: " + ciphertext);
                 out.writeUTF(ciphertext);
                 out.flush();
                 out.close();

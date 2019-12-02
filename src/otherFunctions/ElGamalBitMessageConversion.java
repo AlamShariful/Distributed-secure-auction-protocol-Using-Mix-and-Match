@@ -3,6 +3,7 @@ package otherFunctions;
 import edu.boisestate.elgamal.ElGamalMessage;
 
 import java.math.BigInteger;
+import java.util.StringTokenizer;
 
 public class ElGamalBitMessageConversion
 {
@@ -10,43 +11,57 @@ public class ElGamalBitMessageConversion
     {
         String ciphertext="";
         for (int i=0; i<inputBits.length;i++){
-            System.out.println("Table Output"+inputBits[i].getEncryptedMessage() + " , " + inputBits[i].getEphimeralKey());
-            //ciphertext=ciphertext.concat(getInputTable[i].toString());
             if (ciphertext == ""){
                 ciphertext=inputBits[i].getEncryptedMessage().toString() + "," + inputBits[i].getEphimeralKey().toString();
             }else{
                 ciphertext=ciphertext +"."+inputBits[i].getEncryptedMessage().toString() + "," + inputBits[i].getEphimeralKey().toString();
             }
-
-            //System.out.println("Ciphertext"+ciphertext);
         }
         return  ciphertext;
     }
     public static ElGamalMessage[] StringToElgamalBitMessage(String cipherText)
     {
-        //String.split
-        String [] splittedData = cipherText.split(".");
+        StringTokenizer tokenizer = new StringTokenizer(cipherText, ".");
 
-        System.out.println("splitted size - " + splittedData.length);
+        int totalTokens = tokenizer.countTokens();
 
-        ElGamalMessage [] inputBits = new ElGamalMessage[splittedData.length];
+        ElGamalMessage [] inputBits = new ElGamalMessage[totalTokens];
 
-        String [] fullMessage;
         String message, ephemeralKey;
         BigInteger bigMessage, bigEphemeralKey;
-
-        for(int i=0;i<splittedData.length;i++)
+        int counter = 0;
+        while (tokenizer.hasMoreTokens())
         {
-            fullMessage = splittedData[i].split(",");
-            message = fullMessage[0];
-            ephemeralKey = fullMessage[1];
+            if(counter == totalTokens) break;
 
+            String temp = tokenizer.nextToken();
+
+            StringTokenizer tempTokenizer = new StringTokenizer(temp, ",");
+            if(tempTokenizer.hasMoreTokens())
+            {
+                message = tempTokenizer.nextToken();
+            }
+            else
+            {
+                message = null;
+            }
+            if(tempTokenizer.hasMoreTokens())
+            {
+                ephemeralKey = tempTokenizer.nextToken();
+            }
+            else
+            {
+                ephemeralKey = null;
+            }
             bigMessage = new BigInteger(message);
-            inputBits[i].setEncryptedMessage(bigMessage);
 
             bigEphemeralKey = new BigInteger(ephemeralKey);
-            inputBits[i].setEphimeralKey(bigEphemeralKey);
+
+            inputBits[counter] = new ElGamalMessage(bigEphemeralKey, bigMessage);
+
+            counter++;
         }
+
         return inputBits;
     }
 }

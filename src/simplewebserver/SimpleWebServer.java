@@ -49,6 +49,7 @@ public class SimpleWebServer{
         //get Group Public Key
         System.out.println("generating group public key: " + groupPublicKey.size());
         commonPublicKey=ElGamal.getGroupPublicKey(groupPublicKey);
+        System.out.println("group public key generated: " + groupPublicKey.size());
     }
 
     public void run() throws Exception {
@@ -76,29 +77,30 @@ public class SimpleWebServer{
                 if(i==0){
                     // Client 1 is sending Msg
                     msg_Client1=str;
-                    ElGamalMessage [] bitMsg_client1 = ElGamalBitMessageConversion.StringToElgamalBitMessage(str);
-                    System.out.println("Encrypted Message= ");
-
-                    for(int i=0;i<bitMsg_client1.length;i++)
-                    {
-                        System.out.print(bitMsg_client1[i].getEphimeralKey()+","+bitMsg_client1[i].getEncryptedMessage()+".");
-                    }
-                    System.out.print("\n");
+                    System.out.println("Client 1 received Encrypted Message in string = " + msg_Client1);
+                    ElGamalMessage [] bitMsg_client1 = ElGamalBitMessageConversion.StringToElgamalBitMessage(msg_Client1);
+                    System.out.println("equality test == " + msg_Client1.equals(ElGamalBitMessageConversion.ElgamalBitMessageToString(bitMsg_client1)));
                 }
                 if(i==1){
                     // Client 2 is sending Msg
                     msg_Client2=str;
-                    System.out.println("Encrypted Message= "+str);
+                    System.out.println("Client 2 received Encrypted Message in string = " + msg_Client2);
+                    ElGamalMessage [] bitMsg_client2 = ElGamalBitMessageConversion.StringToElgamalBitMessage(msg_Client2);
+                    System.out.println("equality test == " + msg_Client2.equals(ElGamalBitMessageConversion.ElgamalBitMessageToString(bitMsg_client2)));
                 }
                 if(i==2){
                     // Client 3 is sending Msg
                     msg_Client3=str;
-                    System.out.println("Encrypted Message= "+str);
+                    System.out.println("Client 3 received Encrypted Message in string = " + msg_Client3);
+                    ElGamalMessage [] bitMsg_client3 = ElGamalBitMessageConversion.StringToElgamalBitMessage(msg_Client3);
+                    System.out.println("equality test == " + msg_Client3.equals(ElGamalBitMessageConversion.ElgamalBitMessageToString(bitMsg_client3)));
                 }
                 if(i==3){
                     // Client 4 is sending Msg
                     msg_Client4=str;
-                    System.out.println("Encrypted Message= "+str);
+                    System.out.println("Client 4 received Encrypted Message in string = " + msg_Client4);
+                    ElGamalMessage [] bitMsg_client4 = ElGamalBitMessageConversion.StringToElgamalBitMessage(msg_Client4);
+                    System.out.println("equality test == " + msg_Client4.equals(ElGamalBitMessageConversion.ElgamalBitMessageToString(bitMsg_client4)));
                 }
 
 
