@@ -9,6 +9,12 @@ public class ElGamal {
     private final static int PRIME_UNCERTAINTY = 1000000;
     private final static SecureRandom rnd = new SecureRandom();
 
+    private static BigInteger zeroAlternative = BigInteger.valueOf(3);
+    private static BigInteger negOneAlternative = BigInteger.valueOf(2);
+
+    public static BigInteger GetZeroAlternative() { return zeroAlternative; }
+    public static BigInteger GetNegOneAlternative() { return negOneAlternative; }
+
     /**
      * Generates a random ElGamal Key Pair of a specific bit count
      * @param bits number of bits in numbers generated
@@ -105,6 +111,20 @@ public class ElGamal {
         {
             result = decryptGroupMessage(result, privateKeys.get(i));
         }
+        return result;
+    }
+    public static String decryptDistributedMessageBitByBit(ElGamalMessage [] encryptedMessage, List<ElGamalPrivateKey> privateKeys)
+    {
+        String result = "";
+        ElGamalMessage temp;
+
+        for(int i=0;i<encryptedMessage.length;i++)
+        {
+            temp = decryptDistributedMessage(encryptedMessage[i], privateKeys);
+
+            result = result + temp.getEncryptedMessage().toString();
+        }
+
         return result;
     }
 

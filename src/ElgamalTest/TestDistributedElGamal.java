@@ -57,8 +57,8 @@ public class TestDistributedElGamal
 
         //Greater than table generation test
         BigInteger one = BigInteger.valueOf(1);
-        BigInteger negOne = globalPublicKey.GetNegOneAlternative();    //just for test, assuming that we represent -1 with 2
-        BigInteger zeroAlt = globalPublicKey.GetZeroAlternative();    //just for test, assuming that we represent 0 with 50
+        BigInteger negOne = ElGamal.GetNegOneAlternative();    //just for test, assuming that we represent -1 with 2
+        BigInteger zeroAlt = ElGamal.GetZeroAlternative();    //just for test, assuming that we represent 0 with 50
         ElGamalMessage encOne, encNegOne, encZeroAlt;
 
         encOne = ElGamal.encryptMessage(globalPublicKey, one);

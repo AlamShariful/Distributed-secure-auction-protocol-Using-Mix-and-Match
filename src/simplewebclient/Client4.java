@@ -37,7 +37,7 @@ public class Client4 extends Thread{
 
             //Read commom Public Key from server
             ElGamalPublicKey publicKey = (ElGamalPublicKey) objectInputStream.readObject();
-            System.out.println("Elgamal Object, Public Key: "+ publicKey.getG());
+            System.out.println("Elgamal Object, Public Key: " + publicKey.getP() + "," + publicKey.getG() + "," + publicKey.getB());
 
 
             //String userInput;

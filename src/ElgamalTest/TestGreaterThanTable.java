@@ -25,8 +25,8 @@ public class TestGreaterThanTable {
         //new let's test GreaterThanFunction
         //BigInteger one = BigInteger.ONE;
         BigInteger one = BigInteger.valueOf(1);
-        BigInteger negOne = publicKey.GetNegOneAlternative();    //just for test, assuming that we represent -1 with 2
-        BigInteger zeroAlt = publicKey.GetZeroAlternative();    //just for test, assuming that we represent 0 with 50
+        BigInteger negOne = ElGamal.GetNegOneAlternative();    //just for test, assuming that we represent -1 with 2
+        BigInteger zeroAlt = ElGamal.GetZeroAlternative();    //just for test, assuming that we represent 0 with 50
         //System.out.println("onr = " + one + " and negOne = " + negOne);
 
         ElGamalMessage encOne, encNegOne, encZeroAlt;

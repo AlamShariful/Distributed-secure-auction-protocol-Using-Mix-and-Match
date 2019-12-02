@@ -31,7 +31,7 @@ public class BitbyBitEncryptionTable {
         SenderEncryptionTableRow senderEncryptionTableRow = new SenderEncryptionTableRow();
 
         BigInteger one = BigInteger.ONE;
-        BigInteger zeroAlt = publicKey.GetZeroAlternative();
+        BigInteger zeroAlt = ElGamal.GetZeroAlternative();
 
 
         // split binary string into bit by bit
