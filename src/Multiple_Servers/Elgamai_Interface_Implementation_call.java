@@ -8,6 +8,13 @@ import edu.boisestate.elgamal.*;
 
 public class Elgamai_Interface_Implementation_call extends UnicastRemoteObject implements Elgamal_interface {
 //public class Elgamai_Interface_Implementation_call implements Elgamal_interface {
+
+    BigInteger result=null;
+    BigInteger elgamal_msg = null;
+    //String rtn ="Finally";
+    public static ElGamalPrivateKey privateKey= new ElGamalPrivateKey();
+    ElGamalPublicKey publicKey = new ElGamalPublicKey();
+
     // Default constructor to throw RemoteException
     // from its parent constructor
     private static final long serialVersionUID = 1L;
@@ -24,9 +31,7 @@ public class Elgamai_Interface_Implementation_call extends UnicastRemoteObject i
     //public BigInteger generate_privatekey(String search_privateKey) throws RemoteException{
     public ElGamalPrivateKey generate_privatekey(String search_privateKey, int bits, BigInteger p, BigInteger g) throws RemoteException{
         // return Elgamal Private key
-        BigInteger result=null;
-        ElGamalPrivateKey privateKey= new ElGamalPrivateKey();
-        ElGamalPublicKey publicKey = new ElGamalPublicKey();
+
         if(search_privateKey.equals("get_privateKey")){
 
             //call Elgamal package to get private key
@@ -43,12 +48,27 @@ public class Elgamai_Interface_Implementation_call extends UnicastRemoteObject i
     }
 
     // decrypting msg
+
+    /*
     @Override
     public BigInteger decrypt_messege (ElGamalMessage msg, ElGamalPrivateKey privateKey, String decrypt_msg) throws RemoteException{
         BigInteger elgamal_msg = ElGamal.decryptMessage(msg,privateKey);
 
         return elgamal_msg;
     }
+     */
+    @Override
+    public BigInteger decrypt_messege (ElGamalMessage msg, String decrypt_msg) throws RemoteException{
+        if(decrypt_msg.equals("get_messege")){
+            //System.out.println("Server 2 Private Key:"+ privateKey.getPrivateKey());
+            elgamal_msg = ElGamal.decryptMessage(msg,privateKey);
+        }else{
+            System.out.println("Inside Else Block");
+        }
+        //return rtn;
+        return elgamal_msg;
+    }
+
 
 
 

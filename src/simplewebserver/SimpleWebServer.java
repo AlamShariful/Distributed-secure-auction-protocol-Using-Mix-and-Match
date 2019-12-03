@@ -30,6 +30,15 @@ public class SimpleWebServer{
     private static ElGamalPublicKey server1_publicKey,server2_publicKey, server3_publicKey,commonPublicKey;
     private static ElGamalPrivateKey server1_privateKey,server2_privateKey,server3_privateKey;
     public static String msg_Client1,msg_Client2,msg_Client3,msg_Client4;
+    public static BigInteger decrypt_msg_from_server_2,decrypt_msg_from_server_3;
+
+
+    //Interface
+    Elgamal_interface call_server2,call_server3;
+
+
+    //List for Holding Grouppublic key
+    List<ElGamalPublicKey> groupPublicKey = new ArrayList<ElGamalPublicKey>();
 
     public static int i=0;
 
@@ -47,14 +56,19 @@ public class SimpleWebServer{
     /* The socket used to process incoming connections from web clients */
     private static ServerSocket dServerSocket;
 
-    //List for Holding Grouppublic key
-    List<ElGamalPublicKey> groupPublicKey = new ArrayList<ElGamalPublicKey>();
 
     public SimpleWebServer () throws Exception {
         dServerSocket = new ServerSocket (PORT);
+
+        // calling remote servers
+        calling_remote_Servers_interface();
         getting_publicKey_For_This_server();
         getting_publicKey_From_server2();
         getting_publicKey_From_server3();
+
+        // test call to remote server 2/3,place it accordingly
+        send_Elgamal_msg_to_Server2_for_decryption();
+        send_Elgamal_msg_to_Server3_for_decryption();
 
         //get Group Public Key
         System.out.println("generating group public key: " + groupPublicKey.size());
@@ -204,10 +218,23 @@ public class SimpleWebServer{
         resultBid = BitResultHandler.normalizeBitString(resultBid);
 
         BigInteger decimalResult = BitResultHandler.BitStringToDecimalBigInteger(resultBid);
+
         return decimalResult;
     }
 
     // calling remote server to additional support
+    public void calling_remote_Servers_interface(){
+        try{
+            // lookup method to find reference of remote object
+            call_server2 = (Elgamal_interface) Naming.lookup("rmi://localhost:1900"+
+                            "/privateKey");
+            call_server3 = (Elgamal_interface) Naming.lookup("rmi://localhost:2000"+
+                            "/privateKey");
+        }catch (Exception e){
+            System.out.println(e);
+        }
+    }
+
     public void getting_publicKey_For_This_server(){
         BigInteger result=null;
         ElGamalPrivateKey privateKey= new ElGamalPrivateKey();
@@ -238,12 +265,13 @@ public class SimpleWebServer{
         try
         {
             // lookup method to find reference of remote object
-            Elgamal_interface privateKey1 =
-                    (Elgamal_interface) Naming.lookup("rmi://localhost:1900"+
-                            "/privateKey");
+//            Elgamal_interface privateKey1 =
+//                    (Elgamal_interface) Naming.lookup("rmi://localhost:1900"+
+//                            "/privateKey");
 
-            answer = privateKey1.generate_privatekey(value, bits, p, g);
+            //answer = privateKey1.generate_privatekey(value, bits, p, g);
 
+            answer = call_server2.generate_privatekey(value, bits, p, g);
             // server 2 key pair
             server2_publicKey=answer.getPublicKey();
             server2_privateKey=answer;
@@ -263,16 +291,19 @@ public class SimpleWebServer{
         }
     }
 
+
     public void getting_publicKey_From_server3(){
         ElGamalPrivateKey answer;
         String value="get_privateKey";
         try
         {
             // lookup method to find reference of remote object
-            Elgamal_interface privateKey1 =
-                    (Elgamal_interface) Naming.lookup("rmi://localhost:2000"+
-                            "/privateKey");
-            answer = privateKey1.generate_privatekey(value, bits, p, g);
+//            Elgamal_interface privateKey1 =
+//                    (Elgamal_interface) Naming.lookup("rmi://localhost:2000"+
+//                            "/privateKey");
+            //answer = privateKey1.generate_privatekey(value, bits, p, g);
+
+            answer = call_server3.generate_privatekey(value, bits, p, g);
 
             // server 3 keypair
             server3_publicKey=answer.getPublicKey();
@@ -293,6 +324,50 @@ public class SimpleWebServer{
         }
     }
 
+    // Written today on 12/2/2019
+    public void send_Elgamal_msg_to_Server2_for_decryption(){
+        String drycpt="get_messege";
+
+        // replace this value with the appropriate Elgamal_msg type
+        ElGamalMessage m1=null;
+        try{
+            //calling interface function "decrypt_messege" on server 2
+            decrypt_msg_from_server_2=call_server2.decrypt_messege(m1,drycpt);
+            System.out.println("Calling Server 2 from remote Decryption: "+decrypt_msg_from_server_2);
+
+            // To Do
+            // What to do with the msg,
+            // don't know what type of message is required
+            // therefore keep Biginteger, but can be changed accordingly
+
+
+
+
+        }catch (Exception e){
+            System.out.println(e);
+        }
+    }
+    public void send_Elgamal_msg_to_Server3_for_decryption(){
+        String drycpt="get_messege";
+
+        // replace this value with the appropriate Elgamal_msg type
+        ElGamalMessage m1=null;
+        try{
+            //calling interface function "decrypt_messege" on server 2
+            decrypt_msg_from_server_2=call_server3.decrypt_messege(m1,drycpt);
+            System.out.println("Calling Server 3 from remote Decryption: "+decrypt_msg_from_server_2);
+
+            // To Do
+            // What to do with the msg,
+            // don't know what type of message is required
+            // therefore keep Biginteger, but can be changed accordingly
+
+
+        }catch (Exception e){
+            System.out.println(e);
+        }
+    }
+
 
 
     /* This method is called when the program is run from the command line. */
@@ -302,6 +377,7 @@ public class SimpleWebServer{
 
         // run the coordinator server (this server)
         sws.run();
+
 
 
 
