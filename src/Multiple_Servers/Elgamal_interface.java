@@ -14,5 +14,5 @@ public interface Elgamal_interface extends Remote {
     public ElGamalPrivateKey generate_privatekey(String search_privateKey, int bits, BigInteger p, BigInteger g) throws RemoteException;
     //public BigInteger decrypt_messege (ElGamalMessage msg, ElGamalPrivateKey privatekey, String decrypt_msg) throws RemoteException;
 
-    public ElGamalMessage [] decrypt_messege (ElGamalMessage [] msg, String decrypt_msg) throws RemoteException;
+    public String decrypt_messege (String msg, String decrypt_msg) throws RemoteException;
 }

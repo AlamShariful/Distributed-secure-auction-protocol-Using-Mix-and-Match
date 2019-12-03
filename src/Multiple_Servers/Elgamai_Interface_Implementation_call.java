@@ -4,6 +4,7 @@ import java.rmi.*;
 import java.rmi.server.*;
 import java.math.BigInteger;
 import edu.boisestate.elgamal.*;
+import otherFunctions.ElGamalBitMessageConversion;
 
 
 public class Elgamai_Interface_Implementation_call extends UnicastRemoteObject implements Elgamal_interface {
@@ -58,15 +59,16 @@ public class Elgamai_Interface_Implementation_call extends UnicastRemoteObject i
     }
      */
     @Override
-    public ElGamalMessage [] decrypt_messege (ElGamalMessage [] msg, String decrypt_msg) throws RemoteException{
+    public String decrypt_messege (String msg, String decrypt_msg) throws RemoteException{
         if(decrypt_msg.equals("get_messege")){
             //System.out.println("Server 2 Private Key:"+ privateKey.getPrivateKey());
-            elgamal_msg = ElGamal.partialBitbyBitDecryption(msg,privateKey);
+            ElGamalMessage [] elgMsg = ElGamalBitMessageConversion.StringToElgamalBitMessage(msg);
+            elgamal_msg = ElGamal.partialBitbyBitDecryption(elgMsg,privateKey);
         }else{
             System.out.println("Inside Else Block");
         }
         //return rtn;
-        return elgamal_msg;
+        return ElGamalBitMessageConversion.ElgamalBitMessageToString(elgamal_msg);
     }
 
 

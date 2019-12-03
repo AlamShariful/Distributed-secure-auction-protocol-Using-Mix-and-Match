@@ -5,10 +5,7 @@ import GreaterThanFunction.GreaterThanFunction;
 import Multiple_Servers.Elgamal_interface;
 import Test_RMI_Multiple_Server.Search;
 import Test_RMI_Multiple_Server.SearchQuery;
-import edu.boisestate.elgamal.ElGamal;
-import edu.boisestate.elgamal.ElGamalMessage;
-import edu.boisestate.elgamal.ElGamalPrivateKey;
-import edu.boisestate.elgamal.ElGamalPublicKey;
+import edu.boisestate.elgamal.*;
 import otherFunctions.BitResultHandler;
 import otherFunctions.ElGamalBitMessageConversion;
 
@@ -224,17 +221,20 @@ public class SimpleWebServer{
         //separate server by server decryption
         BigInteger resultPlainText;
         ElGamalMessage [] decryptedMessage = result;
+        String decryptedMessageString;
         //main server
         decryptedMessage = ElGamal.partialBitbyBitDecryption(result, server1_privateKey);
 
         //second server
-        decryptedMessage = send_Elgamal_msg_to_Server2_for_decryption(decryptedMessage);
-
+        decryptedMessage = send_Elgamal_msg_to_Server2_for_decryption(ElGamalBitMessageConversion.ElgamalBitMessageToString(decryptedMessage));
+        //decryptedMessage = ElGamalBitMessageConversion.StringToElgamalBitMessage(decryptedMessageString);
         //third server
-        decryptedMessage = send_Elgamal_msg_to_Server3_for_decryption(decryptedMessage);
+        decryptedMessage = send_Elgamal_msg_to_Server3_for_decryption(ElGamalBitMessageConversion.ElgamalBitMessageToString(decryptedMessage));
+        //decryptedMessage = ElGamalBitMessageConversion.StringToElgamalBitMessage(decryptedMessageString);
 
         String resultBid = ElGamal.getStringToBitbyBitDecryption(decryptedMessage);
-
+        //System.out.println("decrypted message string == " + decryptedMessageString);
+        //String resultBid;
         resultBid = BitResultHandler.normalizeBitString(resultBid);
         BigInteger decimalResult = BitResultHandler.BitStringToDecimalBigInteger(resultBid);
 
@@ -344,14 +344,14 @@ public class SimpleWebServer{
     }
 
     // Written today on 12/2/2019
-    public ElGamalMessage [] send_Elgamal_msg_to_Server2_for_decryption(ElGamalMessage [] message){
+    public ElGamalMessage [] send_Elgamal_msg_to_Server2_for_decryption(String message){
         String drycpt="get_messege";
 
         // replace this value with the appropriate Elgamal_msg type
         //ElGamalMessage m1=null;
         try{
             //calling interface function "decrypt_messege" on server 2
-            decrypt_msg_from_server_2=call_server2.decrypt_messege(message,drycpt);
+            decrypt_msg_from_server_2= ElGamalBitMessageConversion.StringToElgamalBitMessage(call_server2.decrypt_messege(message,drycpt));
             System.out.println("Calling Server 2 from remote Decryption: "+decrypt_msg_from_server_2);
 
             // To Do
@@ -367,14 +367,14 @@ public class SimpleWebServer{
         }
         return decrypt_msg_from_server_2;
     }
-    public ElGamalMessage[] send_Elgamal_msg_to_Server3_for_decryption(ElGamalMessage [] message){
+    public ElGamalMessage[] send_Elgamal_msg_to_Server3_for_decryption(String message){
         String drycpt="get_messege";
 
         // replace this value with the appropriate Elgamal_msg type
         //ElGamalMessage m1=null;
         try{
             //calling interface function "decrypt_messege" on server 2
-            decrypt_msg_from_server_3=call_server3.decrypt_messege(message,drycpt);
+            decrypt_msg_from_server_3=ElGamalBitMessageConversion.StringToElgamalBitMessage(call_server3.decrypt_messege(message,drycpt));
             System.out.println("Calling Server 3 from remote Decryption: "+decrypt_msg_from_server_2);
 
             // To Do
