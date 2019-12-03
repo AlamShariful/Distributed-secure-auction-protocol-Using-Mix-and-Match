@@ -113,6 +113,17 @@ public class ElGamal {
         }
         return result;
     }
+    public static ElGamalMessage [] partialBitbyBitDecryption(ElGamalMessage [] encryptedMessage, ElGamalPrivateKey privateKey)
+    {
+        ElGamalMessage [] result = encryptedMessage;
+
+        for(int i=0;i<result.length;i++)
+        {
+            result[i] = decryptGroupMessage(result[i], privateKey);
+        }
+
+        return result;
+    }
     public static String decryptDistributedMessageBitByBit(ElGamalMessage [] encryptedMessage, List<ElGamalPrivateKey> privateKeys)
     {
         String result = "";
@@ -123,6 +134,18 @@ public class ElGamal {
             temp = decryptDistributedMessage(encryptedMessage[i], privateKeys);
 
             result = result + temp.getEncryptedMessage().toString();
+        }
+
+        return result;
+    }
+    public static String getStringToBitbyBitDecryption(ElGamalMessage [] decryptedMessage)
+    {
+        String result = "";
+        ElGamalMessage temp;
+
+        for(int i=0;i<decryptedMessage.length;i++)
+        {
+            result = result + decryptedMessage[i].getEncryptedMessage().toString();
         }
 
         return result;

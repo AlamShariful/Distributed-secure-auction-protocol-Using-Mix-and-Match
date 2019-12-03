@@ -30,7 +30,7 @@ public class SimpleWebServer{
     private static ElGamalPublicKey server1_publicKey,server2_publicKey, server3_publicKey,commonPublicKey;
     private static ElGamalPrivateKey server1_privateKey,server2_privateKey,server3_privateKey;
     public static String msg_Client1,msg_Client2,msg_Client3,msg_Client4;
-    public static BigInteger decrypt_msg_from_server_2,decrypt_msg_from_server_3;
+    public ElGamalMessage [] decrypt_msg_from_server_2,decrypt_msg_from_server_3;
 
 
     //Interface
@@ -67,8 +67,8 @@ public class SimpleWebServer{
         getting_publicKey_From_server3();
 
         // test call to remote server 2/3,place it accordingly
-        send_Elgamal_msg_to_Server2_for_decryption();
-        send_Elgamal_msg_to_Server3_for_decryption();
+        //send_Elgamal_msg_to_Server2_for_decryption();
+        //send_Elgamal_msg_to_Server3_for_decryption();
 
         //get Group Public Key
         System.out.println("generating group public key: " + groupPublicKey.size());
@@ -207,6 +207,7 @@ public class SimpleWebServer{
     }
     private BigInteger decryptWinningBid(ElGamalMessage [] result)
     {
+        /*all together
         //test with all private key for now
         List<ElGamalPrivateKey> allPrivateKeys=new ArrayList<ElGamalPrivateKey>();
         allPrivateKeys.add(server1_privateKey);
@@ -217,6 +218,24 @@ public class SimpleWebServer{
         String resultBid = ElGamal.decryptDistributedMessageBitByBit(result, allPrivateKeys);
         resultBid = BitResultHandler.normalizeBitString(resultBid);
 
+        BigInteger decimalResult = BitResultHandler.BitStringToDecimalBigInteger(resultBid);
+
+        return decimalResult;*/
+        //separate server by server decryption
+        BigInteger resultPlainText;
+        ElGamalMessage [] decryptedMessage = result;
+        //main server
+        decryptedMessage = ElGamal.partialBitbyBitDecryption(result, server1_privateKey);
+
+        //second server
+        decryptedMessage = send_Elgamal_msg_to_Server2_for_decryption(decryptedMessage);
+
+        //third server
+        decryptedMessage = send_Elgamal_msg_to_Server3_for_decryption(decryptedMessage);
+
+        String resultBid = ElGamal.getStringToBitbyBitDecryption(decryptedMessage);
+
+        resultBid = BitResultHandler.normalizeBitString(resultBid);
         BigInteger decimalResult = BitResultHandler.BitStringToDecimalBigInteger(resultBid);
 
         return decimalResult;
@@ -325,14 +344,14 @@ public class SimpleWebServer{
     }
 
     // Written today on 12/2/2019
-    public void send_Elgamal_msg_to_Server2_for_decryption(){
+    public ElGamalMessage [] send_Elgamal_msg_to_Server2_for_decryption(ElGamalMessage [] message){
         String drycpt="get_messege";
 
         // replace this value with the appropriate Elgamal_msg type
-        ElGamalMessage m1=null;
+        //ElGamalMessage m1=null;
         try{
             //calling interface function "decrypt_messege" on server 2
-            decrypt_msg_from_server_2=call_server2.decrypt_messege(m1,drycpt);
+            decrypt_msg_from_server_2=call_server2.decrypt_messege(message,drycpt);
             System.out.println("Calling Server 2 from remote Decryption: "+decrypt_msg_from_server_2);
 
             // To Do
@@ -346,15 +365,16 @@ public class SimpleWebServer{
         }catch (Exception e){
             System.out.println(e);
         }
+        return decrypt_msg_from_server_2;
     }
-    public void send_Elgamal_msg_to_Server3_for_decryption(){
+    public ElGamalMessage[] send_Elgamal_msg_to_Server3_for_decryption(ElGamalMessage [] message){
         String drycpt="get_messege";
 
         // replace this value with the appropriate Elgamal_msg type
-        ElGamalMessage m1=null;
+        //ElGamalMessage m1=null;
         try{
             //calling interface function "decrypt_messege" on server 2
-            decrypt_msg_from_server_2=call_server3.decrypt_messege(m1,drycpt);
+            decrypt_msg_from_server_3=call_server3.decrypt_messege(message,drycpt);
             System.out.println("Calling Server 3 from remote Decryption: "+decrypt_msg_from_server_2);
 
             // To Do
@@ -366,6 +386,7 @@ public class SimpleWebServer{
         }catch (Exception e){
             System.out.println(e);
         }
+        return decrypt_msg_from_server_3;
     }
 
 

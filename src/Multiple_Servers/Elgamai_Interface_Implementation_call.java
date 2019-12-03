@@ -10,7 +10,7 @@ public class Elgamai_Interface_Implementation_call extends UnicastRemoteObject i
 //public class Elgamai_Interface_Implementation_call implements Elgamal_interface {
 
     BigInteger result=null;
-    BigInteger elgamal_msg = null;
+    ElGamalMessage [] elgamal_msg = null;
     //String rtn ="Finally";
     public static ElGamalPrivateKey privateKey= new ElGamalPrivateKey();
     ElGamalPublicKey publicKey = new ElGamalPublicKey();
@@ -58,10 +58,10 @@ public class Elgamai_Interface_Implementation_call extends UnicastRemoteObject i
     }
      */
     @Override
-    public BigInteger decrypt_messege (ElGamalMessage msg, String decrypt_msg) throws RemoteException{
+    public ElGamalMessage [] decrypt_messege (ElGamalMessage [] msg, String decrypt_msg) throws RemoteException{
         if(decrypt_msg.equals("get_messege")){
             //System.out.println("Server 2 Private Key:"+ privateKey.getPrivateKey());
-            elgamal_msg = ElGamal.decryptMessage(msg,privateKey);
+            elgamal_msg = ElGamal.partialBitbyBitDecryption(msg,privateKey);
         }else{
             System.out.println("Inside Else Block");
         }
