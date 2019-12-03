@@ -3,6 +3,7 @@ import java.io.Serializable;
 import java.rmi.*;
 import java.rmi.server.*;
 import java.math.BigInteger;
+
 import edu.boisestate.elgamal.*;
 import otherFunctions.ElGamalBitMessageConversion;
 
@@ -61,13 +62,24 @@ public class Elgamai_Interface_Implementation_call extends UnicastRemoteObject i
     @Override
     public String decrypt_messege (String msg, String decrypt_msg) throws RemoteException{
         if(decrypt_msg.equals("get_messege")){
-            //System.out.println("Server 2 Private Key:"+ privateKey.getPrivateKey());
+
+            /**
+             * remote servers 2 and 3 use this function for their partial decryption
+             * Sending and returning Elgamal message requires serialization, therefore the
+             * flow is done using strings
+             */
+            System.out.println("Remote Server Applying Partial Decryption");
+
+            //first convert the message back to ElGamal message
             ElGamalMessage [] elgMsg = ElGamalBitMessageConversion.StringToElgamalBitMessage(msg);
+            //partially decrypt the message
             elgamal_msg = ElGamal.partialBitbyBitDecryption(elgMsg,privateKey);
+            System.out.println("Partially decrypted cipher text: " + ElGamalBitMessageConversion.ElgamalBitMessageToString(elgamal_msg));
         }else{
             System.out.println("Inside Else Block");
         }
-        //return rtn;
+
+        //now return the message as string again;
         return ElGamalBitMessageConversion.ElgamalBitMessageToString(elgamal_msg);
     }
 

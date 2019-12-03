@@ -283,13 +283,6 @@ public class SimpleWebServer{
         String value="get_privateKey";
         try
         {
-            // lookup method to find reference of remote object
-//            Elgamal_interface privateKey1 =
-//                    (Elgamal_interface) Naming.lookup("rmi://localhost:1900"+
-//                            "/privateKey");
-
-            //answer = privateKey1.generate_privatekey(value, bits, p, g);
-
             answer = call_server2.generate_privatekey(value, bits, p, g);
             // server 2 key pair
             server2_publicKey=answer.getPublicKey();
@@ -297,9 +290,6 @@ public class SimpleWebServer{
 
             // add this public key to groupPublicKey list
             groupPublicKey.add(server2_publicKey);
-
-            //System.out.println("From Elgamal_Interface__Implementation_call Private Key: "+answer.getPrivateKey());
-            //System.out.println("From Elgamal_Interface__Implementation_call Public Key: "+answer.getPublicKey().getG());
 
             System.out.println("Server 2 Private Key: "+server2_privateKey.getPrivateKey());
             System.out.println("Server 2 Public key: "+server2_publicKey.getP()+","+server2_publicKey.getG()+","+server2_publicKey.getB());
@@ -316,12 +306,6 @@ public class SimpleWebServer{
         String value="get_privateKey";
         try
         {
-            // lookup method to find reference of remote object
-//            Elgamal_interface privateKey1 =
-//                    (Elgamal_interface) Naming.lookup("rmi://localhost:2000"+
-//                            "/privateKey");
-            //answer = privateKey1.generate_privatekey(value, bits, p, g);
-
             answer = call_server3.generate_privatekey(value, bits, p, g);
 
             // server 3 keypair
@@ -330,9 +314,6 @@ public class SimpleWebServer{
 
             // add this public key to groupPublicKey list
             groupPublicKey.add(server3_publicKey);
-
-            //System.out.println("From Elgamal_Interface__Implementation_call Private Key: "+answer.getPrivateKey());
-            //System.out.println("From Elgamal_Interface__Implementation_call Public Key: "+answer.getPublicKey().getG());
 
             System.out.println("Server 3 Private Key: "+server3_privateKey.getPrivateKey());
             System.out.println("Server 3 Public key: "+server3_publicKey.getP()+","+server3_publicKey.getG()+","+server3_publicKey.getB());

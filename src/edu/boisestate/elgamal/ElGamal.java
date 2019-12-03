@@ -38,6 +38,7 @@ public class ElGamal {
 
         return privateKey;
     }
+    //Key pair generation for groups requires that the p and g is common
     public static ElGamalPrivateKey generateKeyPair(int bits, BigInteger p, BigInteger g) {
         //BigInteger p = generateSafePrime(bits);
         //BigInteger g = generateRandomPrimitive(p);
@@ -65,7 +66,6 @@ public class ElGamal {
      */
     public static ElGamalMessage encryptMessage(ElGamalPublicKey publicKey, BigInteger message) {
         if (message.compareTo(publicKey.getP()) >= 0 || message.compareTo(BigInteger.ZERO) == 0) {
-            //System.out.println("coming here");
             return null;
         }
 
@@ -104,15 +104,6 @@ public class ElGamal {
 
         return message;
     }
-    public static ElGamalMessage decryptDistributedMessage(ElGamalMessage encryptedMessage, List<ElGamalPrivateKey> privateKeys) {
-        ElGamalMessage result = encryptedMessage;
-
-        for(int i=0;i<privateKeys.size();i++)
-        {
-            result = decryptGroupMessage(result, privateKeys.get(i));
-        }
-        return result;
-    }
     public static ElGamalMessage [] partialBitbyBitDecryption(ElGamalMessage [] encryptedMessage, ElGamalPrivateKey privateKey)
     {
         ElGamalMessage [] result = encryptedMessage;
@@ -122,6 +113,15 @@ public class ElGamal {
             result[i] = decryptGroupMessage(result[i], privateKey);
         }
 
+        return result;
+    }
+    public static ElGamalMessage decryptDistributedMessage(ElGamalMessage encryptedMessage, List<ElGamalPrivateKey> privateKeys) {
+        ElGamalMessage result = encryptedMessage;
+
+        for(int i=0;i<privateKeys.size();i++)
+        {
+            result = decryptGroupMessage(result, privateKeys.get(i));
+        }
         return result;
     }
     public static String decryptDistributedMessageBitByBit(ElGamalMessage [] encryptedMessage, List<ElGamalPrivateKey> privateKeys)
