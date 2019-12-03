@@ -15,4 +15,5 @@ public interface Elgamal_interface extends Remote {
     //public BigInteger decrypt_messege (ElGamalMessage msg, ElGamalPrivateKey privatekey, String decrypt_msg) throws RemoteException;
 
     public String decrypt_messege (String msg, String decrypt_msg) throws RemoteException;
+    public boolean checkEqualityOfTwoMessage(ElGamalMessage m1, ElGamalMessage m2, ElGamalPrivateKey privateKey) throws RemoteException;
 }
