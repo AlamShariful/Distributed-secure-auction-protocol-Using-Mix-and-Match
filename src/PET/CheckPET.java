@@ -4,6 +4,7 @@ import edu.boisestate.elgamal.ElGamal;
 import edu.boisestate.elgamal.ElGamalMessage;
 import edu.boisestate.elgamal.ElGamalPrivateKey;
 
+import java.awt.*;
 import java.math.BigInteger;
 import java.util.List;
 
@@ -29,6 +30,11 @@ public class CheckPET {
        ElGamalMessage newelgamal=new ElGamalMessage(divideBeta, divideAlpha);
        decryptmessage=ElGamal.decryptMessage(newelgamal, privateKey);
 
+       //prints for tests
+       /*System.out.println("received messages: " + m1.getEncryptedMessage() + "," + m1.getEphimeralKey() + "and " + m2.getEncryptedMessage() + "," + m2.getEphimeralKey());
+       System.out.println("the inverse of message two: " + alphaMessage2Inverse + "," + betaMessage2Inverse);
+       System.out.println("the multiplied message:  " + newelgamal.getEncryptedMessage()+","+newelgamal.getEphimeralKey());
+       System.out.println("after decryption: " + decryptmessage);*/
        if (decryptmessage.equals(BigInteger.valueOf(1)))
        {
            return true;

@@ -272,11 +272,11 @@ public class GreaterThanFunction
             System.out.print("Ai = " + ElGamal.decryptMessage(encNum1[bitIndex], privateKey) + ", Bi = " + ElGamal.decryptMessage(encNum2[bitIndex], privateKey) + " ");
             for(int tableIndex = 0; tableIndex < 12; tableIndex++)
             {
-                if(isBitMessageEqual(encNum1[bitIndex], tableRow[tableIndex].getAi()))
+                if(isBitMessageEqual(encNum1[bitIndex], tableRow[tableIndex].getAi(), privateKey))
                 {
-                    if(isBitMessageEqual(encNum2[bitIndex], tableRow[tableIndex].getBi()))
+                    if(isBitMessageEqual(encNum2[bitIndex], tableRow[tableIndex].getBi(), privateKey))
                     {
-                        if(isBitMessageEqual(previousState, tableRow[tableIndex].getSign()))
+                        if(isBitMessageEqual(previousState, tableRow[tableIndex].getSign(), privateKey))
                         {
                             previousState = tableRow[tableIndex].getOutA();
                             System.out.println("Updated sign: " + ElGamal.decryptMessage(previousState, privateKey));
@@ -378,6 +378,10 @@ public class GreaterThanFunction
             return true;
         }
         return false;
+    }
+    public boolean isBitMessageEqual(ElGamalMessage m1, ElGamalMessage m2, ElGamalPrivateKey privateKey)
+    {
+        return checkpet.checkEqualityOfTwoMessage(m1, m2, privateKey);
     }
     public boolean isBitMessageEqual(ElGamalMessage m1, ElGamalMessage m2) throws RemoteException
     {
