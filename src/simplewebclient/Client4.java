@@ -12,7 +12,9 @@ import java.util.Scanner;
 
 public class Client4 extends Thread{
     private static final String hostName = "localhost";
-    private static final int PORT = 8089;
+    //private static final int PORT = 8089;
+
+    private static final int PORT = 6589;
 
     public static void main(String[] args) throws IOException {
         try (
@@ -86,7 +88,7 @@ public class Client4 extends Thread{
                         }
 
                     }catch (EOFException e){
-                        //System.out.println(e);
+                        System.out.println(e);
                         break;
                     }
                 }

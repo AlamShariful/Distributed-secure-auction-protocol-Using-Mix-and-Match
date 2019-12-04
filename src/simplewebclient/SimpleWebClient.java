@@ -96,7 +96,7 @@ public class SimpleWebClient extends Thread{
                         }
 
                     }catch (EOFException e){
-                        //System.out.println(e);
+                        System.out.println(e);
                         break;
                     }
                 }

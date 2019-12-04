@@ -21,7 +21,8 @@ import java.util.*;
 public class SimpleWebServer{
 
     /* Run the HTTP server on this TCP port. */
-    private static final int PORT = 8089;
+    //private static final int PORT = 8089;
+    private static final int [] PORT = new int []{8089, 8000, 4789, 6589};
     //private static BigInteger server1_publicKey,server2_publicKey, server3_publicKey,server1_privateKey,server2_privateKey,server3_privateKey;
     private static ElGamalPublicKey server1_publicKey,server2_publicKey, server3_publicKey,commonPublicKey;
     private static ElGamalPrivateKey server1_privateKey,server2_privateKey,server3_privateKey;
@@ -31,7 +32,7 @@ public class SimpleWebServer{
 
     //Client Connecting
     private OutputStream outputStream;
-    private ObjectOutputStream obj;
+    private ObjectOutputStream obj1,obj2,obj3,obj4;
     private DataInputStream dis;
 
 
@@ -57,11 +58,19 @@ public class SimpleWebServer{
     private GreaterThanFunction greaterThanFunction;
 
     /* The socket used to process incoming connections from web clients */
-    private static ServerSocket dServerSocket;
+    //private static ServerSocket dServerSocket;
+    private static ServerSocket dServerSocket1;
+    private static ServerSocket dServerSocket2;
+    private static ServerSocket dServerSocket3;
+    private static ServerSocket dServerSocket4;
 
 
     public SimpleWebServer () throws Exception {
-        dServerSocket = new ServerSocket (PORT);
+        //dServerSocket = new ServerSocket (PORT);
+        dServerSocket1 = new ServerSocket (PORT[0]);
+        dServerSocket2 = new ServerSocket (PORT[1]);
+        dServerSocket3 = new ServerSocket (PORT[2]);
+        dServerSocket4 = new ServerSocket (PORT[3]);
 
         // calling remote servers
         calling_remote_Servers_interface();
@@ -92,23 +101,36 @@ public class SimpleWebServer{
                 try{
 
                     /* wait for a connection from a client */
-                    Socket s = dServerSocket.accept();
-                    System.out.println("Client: "+Integer.sum(m,1)+" Connected");
-
-                    // Send output stream Object Via the socket. To client
-                    outputStream = s.getOutputStream();
-                    obj =new ObjectOutputStream(outputStream);
-                    obj.writeObject(commonPublicKey);
-
-                    // read Encrypted messege from User
-                    dis=new DataInputStream(s.getInputStream());
-                    String  str=(String)dis.readUTF();
+//                    Socket s = dServerSocket.accept();
+//                    System.out.println("Client: "+Integer.sum(m,1)+" Connected");
+//
+//                    // Send output stream Object Via the socket. To client
+//                    outputStream = s.getOutputStream();
+//                    obj =new ObjectOutputStream(outputStream);
+//                    obj.writeObject(commonPublicKey);
+//
+//                    // read Encrypted messege from User
+//                    dis=new DataInputStream(s.getInputStream());
+//                    String  str=(String)dis.readUTF();
 
 
 
 
                     //Assign Received Strings to Different Variables
                     if(m==0){
+                        Socket s1 = dServerSocket1.accept();
+                        System.out.println("Client: "+Integer.sum(m,1)+" Connected");
+
+                        // Send output stream Object Via the socket. To client
+                        outputStream = s1.getOutputStream();
+                        obj1 =new ObjectOutputStream(outputStream);
+                        obj1.writeObject(commonPublicKey);
+
+                        // read Encrypted messege from User
+                        dis=new DataInputStream(s1.getInputStream());
+                        String  str=(String)dis.readUTF();
+
+
                         // Client 1 is sending Msg
                         msg_Client1=str;
                         System.out.println("Client 1 received Encrypted Message in string = " + msg_Client1);
@@ -119,6 +141,19 @@ public class SimpleWebServer{
                         //System.out.println("equality test == " + msg_Client1.equals(ElGamalBitMessageConversion.ElgamalBitMessageToString(bitMsg_client1)));
                     }
                     if(m==1){
+
+                        Socket s = dServerSocket2.accept();
+                        System.out.println("Client: "+Integer.sum(m,1)+" Connected");
+
+                        // Send output stream Object Via the socket. To client
+                        outputStream = s.getOutputStream();
+                        obj2 =new ObjectOutputStream(outputStream);
+                        obj2.writeObject(commonPublicKey);
+
+                        // read Encrypted messege from User
+                        dis=new DataInputStream(s.getInputStream());
+                        String  str=(String)dis.readUTF();
+
                         // Client 2 is sending Msg
                         msg_Client2=str;
                         System.out.println("Client 2 received Encrypted Message in string = " + msg_Client2);
@@ -129,6 +164,19 @@ public class SimpleWebServer{
                         //System.out.println("equality test == " + msg_Client2.equals(ElGamalBitMessageConversion.ElgamalBitMessageToString(bitMsg_client2)));
                     }
                     if(m==2){
+
+                        Socket s = dServerSocket3.accept();
+                        System.out.println("Client: "+Integer.sum(m,1)+" Connected");
+
+                        // Send output stream Object Via the socket. To client
+                        outputStream = s.getOutputStream();
+                        obj3 =new ObjectOutputStream(outputStream);
+                        obj3.writeObject(commonPublicKey);
+
+                        // read Encrypted messege from User
+                        dis=new DataInputStream(s.getInputStream());
+                        String  str=(String)dis.readUTF();
+
                         // Client 3 is sending Msg
                         msg_Client3=str;
                         System.out.println("Client 3 received Encrypted Message in string = " + msg_Client3);
@@ -139,6 +187,19 @@ public class SimpleWebServer{
                         //System.out.println("equality test == " + msg_Client3.equals(ElGamalBitMessageConversion.ElgamalBitMessageToString(bitMsg_client3)));
                     }
                     if(m==3){
+
+                        Socket s = dServerSocket4.accept();
+                        System.out.println("Client: "+Integer.sum(m,1)+" Connected");
+
+                        // Send output stream Object Via the socket. To client
+                        outputStream = s.getOutputStream();
+                        obj4 =new ObjectOutputStream(outputStream);
+                        obj4.writeObject(commonPublicKey);
+
+                        // read Encrypted messege from User
+                        dis=new DataInputStream(s.getInputStream());
+                        String  str=(String)dis.readUTF();
+
                         // Client 4 is sending Msg
                         msg_Client4=str;
                         System.out.println("Client 4 received Encrypted Message in string = " + msg_Client4);
@@ -183,7 +244,10 @@ public class SimpleWebServer{
             // Send Winning Bid ConnectedClient
             String winingBid= winner.toString();
             System.out.println("Sending Winning Bid to Client");
-            obj.writeObject(winingBid);
+            obj1.writeObject(winingBid);
+            obj2.writeObject(winingBid);
+            obj3.writeObject(winingBid);
+            obj4.writeObject(winingBid);
 
 
 

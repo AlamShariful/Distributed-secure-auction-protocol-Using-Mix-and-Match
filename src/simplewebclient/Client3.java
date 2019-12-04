@@ -12,7 +12,7 @@ import java.util.Scanner;
 
 public class Client3 extends Thread {
     private static final String hostName = "localhost";
-    private static final int PORT = 8089;
+    private static final int PORT = 4789;
 
     public static void main(String[] args) throws IOException {
         try (
@@ -60,9 +60,10 @@ public class Client3 extends Thread {
                 // split string bit by bit and Encrypt each bit
                 ElGamalMessage[] getInputTable= binary.splitstringAndencryption(s, publicKey);
 
+
+                ciphertext = ElGamalBitMessageConversion.ElgamalBitMessageToString(getInputTable);
                 //String representation of ciphertext
                 System.out.println("sending bits: " + ciphertext);
-                ciphertext = ElGamalBitMessageConversion.ElgamalBitMessageToString(getInputTable);
 
                 // Sending Cipher text to Server
                 out.writeUTF(ciphertext);
@@ -84,7 +85,7 @@ public class Client3 extends Thread {
                         }
 
                     }catch (EOFException e){
-                        //System.out.println(e);
+                        System.out.println(e);
                         break;
                     }
                 }
