@@ -82,6 +82,12 @@ public class Elgamai_Interface_Implementation_call extends UnicastRemoteObject i
         //now return the message as string again;
         return ElGamalBitMessageConversion.ElgamalBitMessageToString(elgamal_msg);
     }
+    public ElGamalMessage decrypt_messege (ElGamalMessage msg) throws RemoteException
+    {
+            ElGamalMessage elgMsg = ElGamal.decryptGroupMessage(msg, privateKey);
+            //partially decrypt the message
+            return elgMsg;
+    }
 
 
     public boolean checkEqualityOfTwoMessage(ElGamalMessage m1, ElGamalMessage m2, ElGamalPrivateKey privateKey) throws RemoteException{
@@ -108,6 +114,27 @@ public class Elgamai_Interface_Implementation_call extends UnicastRemoteObject i
             return true;
         }
         return false;
+    }
+    public ElGamalMessage getDivision(ElGamalMessage m1, ElGamalMessage m2) throws RemoteException
+    {
+        BigInteger alphaMessage1, betaMessage1,alphaMessage2, betaMessage2, divideAlpha, divideBeta;
+
+        // get alpha and beta for message 1
+        alphaMessage1 =m1.getEncryptedMessage();
+        betaMessage1 =m1.getEphimeralKey();
+
+        // get alpha and beta for message 2
+        alphaMessage2 = m2.getEncryptedMessage();
+        betaMessage2 = m2.getEphimeralKey();
+        BigInteger alphaMessage2Inverse = ElGamal.extendedEuclidAlgorithm(privateKey.getPublicKey().getP(), alphaMessage2).getT();
+        BigInteger betaMessage2Inverse = ElGamal.extendedEuclidAlgorithm(privateKey.getPublicKey().getP(), betaMessage2).getT();
+
+        divideAlpha = (alphaMessage1.multiply(alphaMessage2Inverse)).mod(privateKey.getPublicKey().getP());
+        divideBeta = (betaMessage1.multiply(betaMessage2Inverse)).mod(privateKey.getPublicKey().getP());
+
+        ElGamalMessage newelgamal=new ElGamalMessage(divideBeta, divideAlpha);
+
+        return newelgamal;
     }
 
 

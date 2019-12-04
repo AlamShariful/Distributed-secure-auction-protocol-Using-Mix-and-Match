@@ -2,7 +2,7 @@ package edu.boisestate.elgamal;
 
 import java.math.BigInteger;
 
-public class ElGamalMessage {
+public class ElGamalMessage implements  java.io.Serializable{
     private BigInteger ephimeralKey;
     private BigInteger encryptedMessage;
 

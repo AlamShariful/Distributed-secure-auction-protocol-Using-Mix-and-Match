@@ -91,7 +91,7 @@ public class TestDistributedElGamal
         ElGamalMessage [] encNum2= binary.splitstringAndencryption(num2S, globalPublicKey);
 
         System.out.println("Checking the greater than function for the plain texts == " + num1 + ", " + num2);
-        boolean result = greaterThanFunction.CheckDistributedGreater(encNum1, encNum2, list1);
-        System.out.println("result == " + result);
+        //boolean result = greaterThanFunction.CheckDistributedGreater(encNum1, encNum2, list1);
+        //System.out.println("result == " + result);
     }
 }

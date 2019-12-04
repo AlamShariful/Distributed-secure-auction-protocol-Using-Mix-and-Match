@@ -15,6 +15,7 @@ import java.net.*;
 import static java.nio.file.StandardOpenOption.APPEND;
 import java.nio.file.*;
 import java.rmi.Naming;
+import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.util.*;
 //import com.google.gson.*;
@@ -38,7 +39,7 @@ public class SimpleWebServer{
 
 
     //Interface
-    Elgamal_interface call_server2,call_server3;
+    public Elgamal_interface call_server2,call_server3;
 
 
     //List for Holding Grouppublic key
@@ -219,8 +220,10 @@ public class SimpleWebServer{
             greaterThanFunction.PrintTable();
             greaterThanFunction.ReShuffleAndReEncryptTable(commonPublicKey);
             greaterThanFunction.PrintTable();
+
+            greaterThanFunction.saveServerInstance(this);
         }
-        private ElGamalMessage [] findGreater(ElGamalMessage [] bid1, ElGamalMessage [] bid2)
+        private ElGamalMessage [] findGreater(ElGamalMessage [] bid1, ElGamalMessage [] bid2) throws RemoteException
         {
             //test with all private key for now
             List<ElGamalPrivateKey> allPrivateKeys=new ArrayList<ElGamalPrivateKey>();
@@ -228,11 +231,11 @@ public class SimpleWebServer{
             allPrivateKeys.add(server2_privateKey);
             allPrivateKeys.add(server3_privateKey);
             //execute pairwuse comparison
-            if(greaterThanFunction.CheckDistributedGreater(bid1, bid2, allPrivateKeys))
+            if(greaterThanFunction.CheckDistributedGreater(bid1, bid2))
             {
                 return bid1;
             }
-            else if(greaterThanFunction.CheckDistributedGreater(bid2, bid1, allPrivateKeys))
+            else if(greaterThanFunction.CheckDistributedGreater(bid2, bid1))
             {
                 return bid2;
             }
@@ -408,7 +411,33 @@ public class SimpleWebServer{
             }
             return decrypt_msg_from_server_3;
         }
+    public ElGamalMessage getDivision(ElGamalMessage m1, ElGamalMessage m2) throws RemoteException
+    {
+        BigInteger alphaMessage1, betaMessage1,alphaMessage2, betaMessage2, divideAlpha, divideBeta;
 
+        // get alpha and beta for message 1
+        alphaMessage1 =m1.getEncryptedMessage();
+        betaMessage1 =m1.getEphimeralKey();
+
+        // get alpha and beta for message 2
+        alphaMessage2 = m2.getEncryptedMessage();
+        betaMessage2 = m2.getEphimeralKey();
+        BigInteger alphaMessage2Inverse = ElGamal.extendedEuclidAlgorithm(server1_privateKey.getPublicKey().getP(), alphaMessage2).getT();
+        BigInteger betaMessage2Inverse = ElGamal.extendedEuclidAlgorithm(server1_privateKey.getPublicKey().getP(), betaMessage2).getT();
+
+        divideAlpha = (alphaMessage1.multiply(alphaMessage2Inverse)).mod(server1_privateKey.getPublicKey().getP());
+        divideBeta = (betaMessage1.multiply(betaMessage2Inverse)).mod(server1_privateKey.getPublicKey().getP());
+
+        ElGamalMessage newelgamal=new ElGamalMessage(divideBeta, divideAlpha);
+
+        return newelgamal;
+    }
+        public ElGamalMessage decrypt_messege (ElGamalMessage msg) throws RemoteException
+        {
+            ElGamalMessage elgMsg = ElGamal.decryptGroupMessage(msg, server1_privateKey);
+            //partially decrypt the message
+            return elgMsg;
+        }
 
 
         /* This method is called when the program is run from the command line. */

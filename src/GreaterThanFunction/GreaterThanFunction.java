@@ -1,6 +1,7 @@
 package GreaterThanFunction;
 
 import java.math.BigInteger;
+import java.rmi.RemoteException;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -10,6 +11,7 @@ import edu.boisestate.elgamal.ElGamal;
 import edu.boisestate.elgamal.ElGamalMessage;
 import edu.boisestate.elgamal.ElGamalPrivateKey;
 import edu.boisestate.elgamal.ElGamalPublicKey;
+import simplewebserver.SimpleWebServer;
 
 
 public class GreaterThanFunction
@@ -17,6 +19,9 @@ public class GreaterThanFunction
     private TableRow[] tableRow;
     private ElGamalMessage encOfOne, encOfNegOne, encOfZeroAlt;
     private CheckPET checkpet;
+
+
+    private SimpleWebServer server;
 
     public GreaterThanFunction(ElGamalMessage mEncOfOne, ElGamalMessage mEncOfNegOne, ElGamalMessage mEncOfZeroAlt)
     {
@@ -113,6 +118,10 @@ public class GreaterThanFunction
             System.out.println(tableRow[i].getAi().getEncryptedMessage() + "         " + tableRow[i].getBi().getEncryptedMessage() + "         " + tableRow[i].getSign().getEncryptedMessage()
                                + "         " + tableRow[i].getOutA().getEncryptedMessage() + "          " + tableRow[i].getOutB().getEncryptedMessage());
         }
+    }
+    public void saveServerInstance(SimpleWebServer server)
+    {
+        this.server = server;
     }
     public void PrintGroupDecryptedTable(List<ElGamalPrivateKey> privateKeys)
     {
@@ -251,7 +260,7 @@ public class GreaterThanFunction
             tableRow[rand_int2].setOutB(ElGamal.reEncryptMessage(tableRow[rand_int2].getOutB(), publicKey));    //re-encrypt OutB col
         }
     }
-    public boolean CheckGreater(ElGamalMessage [] encNum1, ElGamalMessage [] encNum2, ElGamalPrivateKey privateKey)
+    public boolean CheckGreater(ElGamalMessage [] encNum1, ElGamalMessage [] encNum2, ElGamalPrivateKey privateKey) throws RemoteException
     {
         ElGamalMessage previousState = encOfZeroAlt;    //by default we assume that the numbers are equal
         //usingFileWriter("initial previous state == " + previousState + "\n");
@@ -263,11 +272,11 @@ public class GreaterThanFunction
             System.out.print("Ai = " + ElGamal.decryptMessage(encNum1[bitIndex], privateKey) + ", Bi = " + ElGamal.decryptMessage(encNum2[bitIndex], privateKey) + " ");
             for(int tableIndex = 0; tableIndex < 12; tableIndex++)
             {
-                if(isBitMessageEqual(encNum1[bitIndex], tableRow[tableIndex].getAi(), privateKey))
+                if(isBitMessageEqual(encNum1[bitIndex], tableRow[tableIndex].getAi()))
                 {
-                    if(isBitMessageEqual(encNum2[bitIndex], tableRow[tableIndex].getBi(), privateKey))
+                    if(isBitMessageEqual(encNum2[bitIndex], tableRow[tableIndex].getBi()))
                     {
-                        if(isBitMessageEqual(previousState, tableRow[tableIndex].getSign(), privateKey))
+                        if(isBitMessageEqual(previousState, tableRow[tableIndex].getSign()))
                         {
                             previousState = tableRow[tableIndex].getOutA();
                             System.out.println("Updated sign: " + ElGamal.decryptMessage(previousState, privateKey));
@@ -285,7 +294,45 @@ public class GreaterThanFunction
         }
         return false;
     }
-    public boolean CheckDistributedGreater(ElGamalMessage [] encNum1, ElGamalMessage [] encNum2, List<ElGamalPrivateKey> privateKeys)
+    public boolean CheckGreater(ElGamalMessage [] encNum1, ElGamalMessage [] encNum2) throws RemoteException
+    {
+        ElGamalMessage previousState = encOfZeroAlt;    //by default we assume that the numbers are equal
+        //usingFileWriter("initial previous state == " + previousState + "\n");
+        //System.out.println("initial previous state == " + previousState);
+
+        for(int bitIndex = 0; bitIndex < 1024; bitIndex++)
+        {
+            //System.out.println("checking for bit == " + bitIndex);
+            //System.out.print("Ai = " + ElGamal.decryptMessage(encNum1[bitIndex], privateKey) + ", Bi = " + ElGamal.decryptMessage(encNum2[bitIndex], privateKey) + " ");
+            for(int tableIndex = 0; tableIndex < 12; tableIndex++)
+            {
+                if(isBitMessageEqual(encNum1[bitIndex], tableRow[tableIndex].getAi()))
+                {
+                    if(isBitMessageEqual(encNum2[bitIndex], tableRow[tableIndex].getBi()))
+                    {
+                        if(isBitMessageEqual(previousState, tableRow[tableIndex].getSign()))
+                        {
+                            previousState = tableRow[tableIndex].getOutA();
+                            //System.out.println("Updated sign: " + ElGamal.decryptMessage(previousState, privateKey));
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+        ElGamalMessage result = previousState;
+
+        result = server.decrypt_messege(result);
+        result = server.call_server2.decrypt_messege(result);
+        result = server.call_server3.decrypt_messege(result);
+
+        if(result.getEncryptedMessage().equals(BigInteger.valueOf(1)))
+        {
+            return true;
+        }
+        return false;
+    }
+    public boolean CheckDistributedGreater(ElGamalMessage [] encNum1, ElGamalMessage [] encNum2) throws RemoteException
     {
         ElGamalMessage previousState = encOfZeroAlt;    //by default we assume that the numbers are equal
         //usingFileWriter("initial previous state == " + previousState + "\n");
@@ -297,11 +344,11 @@ public class GreaterThanFunction
             //System.out.print("Ai = " + ElGamal.decryptDistributedMessage(encNum1[bitIndex], privateKeys).getEncryptedMessage() + ", Bi = " + ElGamal.decryptDistributedMessage(encNum2[bitIndex], privateKeys).getEncryptedMessage() + " " + ElGamal.decryptDistributedMessage(previousState, privateKeys).getEncryptedMessage()+ " \n");
             for(int tableIndex = 0; tableIndex < 12; tableIndex++)
             {
-                if(isDistributedBitMessageEqual(encNum1[bitIndex], tableRow[tableIndex].getAi(), privateKeys))
+                if(isDistributedBitMessageEqual(encNum1[bitIndex], tableRow[tableIndex].getAi()))
                 {
-                    if(isDistributedBitMessageEqual(encNum2[bitIndex], tableRow[tableIndex].getBi(), privateKeys))
+                    if(isDistributedBitMessageEqual(encNum2[bitIndex], tableRow[tableIndex].getBi()))
                     {
-                        if(isDistributedBitMessageEqual(previousState, tableRow[tableIndex].getSign(), privateKeys))
+                        if(isDistributedBitMessageEqual(previousState, tableRow[tableIndex].getSign()))
                         {
                             previousState = tableRow[tableIndex].getOutA();
                             //System.out.println("Updated sign: " + ElGamal.decryptMessage(previousState, privateKeys));
@@ -320,22 +367,44 @@ public class GreaterThanFunction
             }
         }
         //System.out.println("finally the updated state: " + ElGamal.decryptMessage(previousState, privateKey));
-        BigInteger result;
+        ElGamalMessage result = previousState;
 
-        result = ElGamal.decryptDistributedMessage(previousState, privateKeys).getEncryptedMessage();
+        result = server.decrypt_messege(result);
+        result = server.call_server2.decrypt_messege(result);
+        result = server.call_server3.decrypt_messege(result);
 
-        if(result.equals(BigInteger.valueOf(1)))
+        if(result.getEncryptedMessage().equals(BigInteger.valueOf(1)))
         {
-            return  true;
+            return true;
         }
         return false;
     }
-    public boolean isBitMessageEqual(ElGamalMessage m1, ElGamalMessage m2, ElGamalPrivateKey privateKey)
+    public boolean isBitMessageEqual(ElGamalMessage m1, ElGamalMessage m2) throws RemoteException
     {
-        return checkpet.checkEqualityOfTwoMessage(m1, m2, privateKey);
+        ElGamalMessage divided = server.getDivision(m1, m2);
+
+        divided = server.decrypt_messege(divided);
+        divided = server.call_server2.decrypt_messege(divided);
+        divided = server.call_server3.decrypt_messege(divided);
+
+        if(divided.getEncryptedMessage().equals(BigInteger.valueOf(1)))
+        {
+            return true;
+        }
+        return false;
     }
-    public boolean isDistributedBitMessageEqual(ElGamalMessage m1, ElGamalMessage m2, List<ElGamalPrivateKey> privateKeys)
+    public boolean isDistributedBitMessageEqual(ElGamalMessage m1, ElGamalMessage m2) throws RemoteException
     {
-        return checkpet.checkDistributedEqualityOfTwoMessage(m1, m2, privateKeys);
+        ElGamalMessage divided = server.getDivision(m1, m2);
+
+        divided = server.decrypt_messege(divided);
+        divided = server.call_server2.decrypt_messege(divided);
+        divided = server.call_server3.decrypt_messege(divided);
+
+        if(divided.getEncryptedMessage().equals(BigInteger.valueOf(1)))
+        {
+            return true;
+        }
+        return false;
     }
 }
