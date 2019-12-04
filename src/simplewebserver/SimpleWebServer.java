@@ -313,7 +313,7 @@ public class SimpleWebServer{
             greaterThanFunction = new GreaterThanFunction(encOne, encNegOne, encZeroAlt);   //sign is equal
             greaterThanFunction.generateFullGreaterThanTable();
             greaterThanFunction.PrintTable();
-            System.out.println("re-shuffling the table:");
+            System.out.println("re-shuffling and re-encrypting the table:");
             greaterThanFunction.ReShuffleAndReEncryptTable(commonPublicKey);
             greaterThanFunction.PrintTable();
 
@@ -343,13 +343,19 @@ public class SimpleWebServer{
             BigInteger resultPlainText;
             ElGamalMessage [] decryptedMessage = result;
             String decryptedMessageString;
+
             //main server
+            System.out.println("Server one decrypting....");
             decryptedMessage = ElGamal.partialBitbyBitDecryption(result, server1_privateKey);
+            System.out.println("Server 1 decryption complete: "+ ElGamalBitMessageConversion.ElgamalBitMessageToString(decryptedMessage));
 
             //second server
             decryptedMessage = send_Elgamal_msg_to_Server2_for_decryption(ElGamalBitMessageConversion.ElgamalBitMessageToString(decryptedMessage));
+            System.out.println("Server 2 decryption complete: "+ ElGamalBitMessageConversion.ElgamalBitMessageToString(decryptedMessage));
+
             //third server
             decryptedMessage = send_Elgamal_msg_to_Server3_for_decryption(ElGamalBitMessageConversion.ElgamalBitMessageToString(decryptedMessage));
+            System.out.println("Server 3 decryption complete: "+ ElGamalBitMessageConversion.ElgamalBitMessageToString(decryptedMessage));
 
             String resultBid = ElGamal.getStringToBitbyBitDecryption(decryptedMessage);
 
