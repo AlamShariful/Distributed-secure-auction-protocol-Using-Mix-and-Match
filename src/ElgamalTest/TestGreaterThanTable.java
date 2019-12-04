@@ -2,6 +2,7 @@ package ElgamalTest;
 
 import GreaterThanFunction.GreaterThanFunction;
 import PET.CheckPET;
+import com.sun.xml.internal.messaging.saaj.util.CharWriter;
 import edu.boisestate.elgamal.*;
 
 import java.io.IOException;
@@ -121,5 +122,20 @@ public class TestGreaterThanTable {
 
         boolean result = checkpet.checkEqualityOfTwoMessage(encNegOne, encNegOne, privateKey);
         System.out.println("result == "  + result);*/
+
+        //PET finction test
+        ElGamalMessage nOne, nTwo;
+
+        nOne = ElGamal.encryptMessage(publicKey, BigInteger.valueOf(5));
+        System.out.println("nOne = " + nOne.getEncryptedMessage() + ", " + nOne.getEphimeralKey());
+
+        nTwo = ElGamal.encryptMessage(publicKey, one);
+        System.out.println("nTwo = " + nTwo.getEncryptedMessage() + ", " + nTwo.getEphimeralKey());
+
+        System.out.println("checking PET: ");
+
+        CheckPET checkPET = new CheckPET();
+        result = checkPET.checkEqualityOfTwoMessage(encNegOne, encNegOne, privateKey);
+        System.out.println("result == "  + result);
     }
 }
