@@ -185,21 +185,21 @@ public class ElGamal {
     }
     public static ElGamalPublicKey getGroupPublicKey(List<ElGamalPublicKey> publicKeys)
     {
-        System.out.println("size == " + publicKeys.size());
-        System.out.println("Param: " + publicKeys.get(0).getB());
-        System.out.println("Param: " + publicKeys.get(1).getB());
+        //System.out.println("size == " + publicKeys.size());
+        //System.out.println("Param: " + publicKeys.get(0).getB());
+        //System.out.println("Param: " + publicKeys.get(1).getB());
 
         BigInteger groupB = BigInteger.ONE;
         for(int i=0;i<publicKeys.size();i++)
         {
             groupB = groupB.multiply(publicKeys.get(i).getB());
-            System.out.println("gB = " + groupB);
+            //System.out.println("gB = " + groupB);
         }
         groupB = groupB.mod(publicKeys.get(0).getP());
-        System.out.println("Finally gB = " + groupB);
+        //System.out.println("Finally gB = " + groupB);
         BigInteger groupP = publicKeys.get(0).getP();
         BigInteger groupG = publicKeys.get(0).getG();
-        System.out.println("gP = " + groupP);
+        //System.out.println("gP = " + groupP);
         ElGamalPublicKey groupPublicKey = new ElGamalPublicKey();
         groupPublicKey.setP(groupP);
         groupPublicKey.setG(groupG);

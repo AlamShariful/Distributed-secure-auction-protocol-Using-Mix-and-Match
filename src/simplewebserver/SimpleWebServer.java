@@ -3,8 +3,6 @@ package simplewebserver;
 
 import GreaterThanFunction.GreaterThanFunction;
 import Multiple_Servers.Elgamal_interface;
-import Test_RMI_Multiple_Server.Search;
-import Test_RMI_Multiple_Server.SearchQuery;
 import edu.boisestate.elgamal.*;
 import otherFunctions.BitResultHandler;
 import otherFunctions.ElGamalBitMessageConversion;
@@ -76,15 +74,12 @@ public class SimpleWebServer{
         //send_Elgamal_msg_to_Server3_for_decryption();
 
         //get Group Public Key
-        System.out.println("generating group public key: " + groupPublicKey.size());
+        System.out.println("generating group public key.... ");
         commonPublicKey=ElGamal.getGroupPublicKey(groupPublicKey);
-        System.out.println("group public key generated: " + groupPublicKey.size());
+        System.out.println("group public key generated: " + commonPublicKey.getP()+","+commonPublicKey.getG()+","+commonPublicKey.getB());
     }
 
     public void run() throws Exception {
-
-
-
 
         // We are Condidering 4 Client, therefore this loop should Run 4 time (Connect 4 client)
 
@@ -206,6 +201,7 @@ public class SimpleWebServer{
         private void initializeGreaterThanTable()
         {
             //prepare greater than table
+            System.out.println("Generating Greater than table");
             BigInteger one = BigInteger.valueOf(1);
             BigInteger negOne = ElGamal.GetNegOneAlternative();    //just for test, assuming that we represent -1 with 2
             BigInteger zeroAlt = ElGamal.GetZeroAlternative();    //just for test, assuming that we represent 0 with 50
@@ -218,6 +214,7 @@ public class SimpleWebServer{
             greaterThanFunction = new GreaterThanFunction(encOne, encNegOne, encZeroAlt);   //sign is equal
             greaterThanFunction.generateFullGreaterThanTable();
             greaterThanFunction.PrintTable();
+            System.out.println("re-shuffling the table:");
             greaterThanFunction.ReShuffleAndReEncryptTable(commonPublicKey);
             greaterThanFunction.PrintTable();
 
@@ -225,11 +222,6 @@ public class SimpleWebServer{
         }
         private ElGamalMessage [] findGreater(ElGamalMessage [] bid1, ElGamalMessage [] bid2) throws RemoteException
         {
-            //test with all private key for now
-            List<ElGamalPrivateKey> allPrivateKeys=new ArrayList<ElGamalPrivateKey>();
-            allPrivateKeys.add(server1_privateKey);
-            allPrivateKeys.add(server2_privateKey);
-            allPrivateKeys.add(server3_privateKey);
             //execute pairwuse comparison
             if(greaterThanFunction.CheckDistributedGreater(bid1, bid2))
             {
@@ -246,21 +238,6 @@ public class SimpleWebServer{
         }
         private BigInteger decryptWinningBid(ElGamalMessage [] result)
         {
-            /*all together
-            //test with all private key for now
-            List<ElGamalPrivateKey> allPrivateKeys=new ArrayList<ElGamalPrivateKey>();
-            allPrivateKeys.add(server1_privateKey);
-            allPrivateKeys.add(server2_privateKey);
-            allPrivateKeys.add(server3_privateKey);
-
-            //decrypting
-            String resultBid = ElGamal.decryptDistributedMessageBitByBit(result, allPrivateKeys);
-            resultBid = BitResultHandler.normalizeBitString(resultBid);
-
-            BigInteger decimalResult = BitResultHandler.BitStringToDecimalBigInteger(resultBid);
-
-            return decimalResult;*/
-            //separate server by server decryption
             BigInteger resultPlainText;
             ElGamalMessage [] decryptedMessage = result;
             String decryptedMessageString;
@@ -269,14 +246,11 @@ public class SimpleWebServer{
 
             //second server
             decryptedMessage = send_Elgamal_msg_to_Server2_for_decryption(ElGamalBitMessageConversion.ElgamalBitMessageToString(decryptedMessage));
-            //decryptedMessage = ElGamalBitMessageConversion.StringToElgamalBitMessage(decryptedMessageString);
             //third server
             decryptedMessage = send_Elgamal_msg_to_Server3_for_decryption(ElGamalBitMessageConversion.ElgamalBitMessageToString(decryptedMessage));
-            //decryptedMessage = ElGamalBitMessageConversion.StringToElgamalBitMessage(decryptedMessageString);
 
             String resultBid = ElGamal.getStringToBitbyBitDecryption(decryptedMessage);
-            //System.out.println("decrypted message string == " + decryptedMessageString);
-            //String resultBid;
+
             resultBid = BitResultHandler.normalizeBitString(resultBid);
             BigInteger decimalResult = BitResultHandler.BitStringToDecimalBigInteger(resultBid);
 
@@ -447,9 +421,6 @@ public class SimpleWebServer{
 
             // run the coordinator server (this server)
             sws.run();
-
-
-
 
         }
 }

@@ -64,6 +64,7 @@ public class Client2 extends Thread{
                 ciphertext = ElGamalBitMessageConversion.ElgamalBitMessageToString(getInputTable);
 
                 // Sending Cipher text to Server
+                System.out.println("sending bits: " + ciphertext);
                 out.writeUTF(ciphertext);
                 out.flush();
                 //out.close();
