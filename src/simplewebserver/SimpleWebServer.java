@@ -120,7 +120,7 @@ public class SimpleWebServer{
                         allBiddings[allBiddingCounter] = new ElGamalMessage[bitMsg_client1.length];
                         allBiddings[allBiddingCounter] = bitMsg_client1;
                         allBiddingCounter++;
-                        System.out.println("equality test == " + msg_Client1.equals(ElGamalBitMessageConversion.ElgamalBitMessageToString(bitMsg_client1)));
+                        //System.out.println("equality test == " + msg_Client1.equals(ElGamalBitMessageConversion.ElgamalBitMessageToString(bitMsg_client1)));
                     }
                     if(m==1){
                         // Client 2 is sending Msg
@@ -130,7 +130,7 @@ public class SimpleWebServer{
                         allBiddings[allBiddingCounter] = new ElGamalMessage[bitMsg_client2.length];
                         allBiddings[allBiddingCounter] = bitMsg_client2;
                         allBiddingCounter++;
-                        System.out.println("equality test == " + msg_Client2.equals(ElGamalBitMessageConversion.ElgamalBitMessageToString(bitMsg_client2)));
+                        //System.out.println("equality test == " + msg_Client2.equals(ElGamalBitMessageConversion.ElgamalBitMessageToString(bitMsg_client2)));
                     }
                     if(m==2){
                         // Client 3 is sending Msg
@@ -140,7 +140,7 @@ public class SimpleWebServer{
                         allBiddings[allBiddingCounter] = new ElGamalMessage[bitMsg_client3.length];
                         allBiddings[allBiddingCounter] = bitMsg_client3;
                         allBiddingCounter++;
-                        System.out.println("equality test == " + msg_Client3.equals(ElGamalBitMessageConversion.ElgamalBitMessageToString(bitMsg_client3)));
+                        //System.out.println("equality test == " + msg_Client3.equals(ElGamalBitMessageConversion.ElgamalBitMessageToString(bitMsg_client3)));
                     }
                     if(m==3){
                         // Client 4 is sending Msg
@@ -150,7 +150,7 @@ public class SimpleWebServer{
                         allBiddings[allBiddingCounter] = new ElGamalMessage[bitMsg_client4.length];
                         allBiddings[allBiddingCounter] = bitMsg_client4;
                         allBiddingCounter++;
-                        System.out.println("equality test == " + msg_Client4.equals(ElGamalBitMessageConversion.ElgamalBitMessageToString(bitMsg_client4)));
+                        //System.out.println("equality test == " + msg_Client4.equals(ElGamalBitMessageConversion.ElgamalBitMessageToString(bitMsg_client4)));
                     }
 
 
@@ -165,8 +165,8 @@ public class SimpleWebServer{
 
 
             System.out.println("4 messages collected. Messages are: \n" + msg_Client1 + "\n" + msg_Client2 + "\n"+ msg_Client3 + "\n"+ msg_Client4 + "\n");
-            System.out.println("checking equality with global storage:");
-            System.out.println(ElGamalBitMessageConversion.ElgamalBitMessageToString(allBiddings[0]).equals(msg_Client1) + ", " + ElGamalBitMessageConversion.ElgamalBitMessageToString(allBiddings[1]).equals(msg_Client2) + ", " + ElGamalBitMessageConversion.ElgamalBitMessageToString(allBiddings[2]).equals(msg_Client3) + ", " + ElGamalBitMessageConversion.ElgamalBitMessageToString(allBiddings[3]).equals(msg_Client4));
+            //System.out.println("checking equality with global storage:");
+            //System.out.println(ElGamalBitMessageConversion.ElgamalBitMessageToString(allBiddings[0]).equals(msg_Client1) + ", " + ElGamalBitMessageConversion.ElgamalBitMessageToString(allBiddings[1]).equals(msg_Client2) + ", " + ElGamalBitMessageConversion.ElgamalBitMessageToString(allBiddings[2]).equals(msg_Client3) + ", " + ElGamalBitMessageConversion.ElgamalBitMessageToString(allBiddings[3]).equals(msg_Client4));
 
             //initialize greater than table
             initializeGreaterThanTable();
@@ -174,7 +174,8 @@ public class SimpleWebServer{
             ElGamalMessage [] result = allBiddings[0];
             for(int i=1;i<allBiddingCounter;i++)
             {
-                result = findGreater(result, allBiddings[i]);
+                result = generatePairTableAndFindMax(result, allBiddings[i]);
+                greaterThanFunction.ReShuffleAndReEncryptTable(commonPublicKey);
             }
 
             System.out.println("winner cipher text found!!, Decrypting bid: ");
@@ -198,6 +199,47 @@ public class SimpleWebServer{
 
             }
         }
+        private ElGamalMessage [] generatePairTableAndFindMax(ElGamalMessage [] m1, ElGamalMessage [] m2) throws RemoteException
+        {
+            ElGamalMessage [] m1Prime = new ElGamalMessage[m1.length + 1];
+
+            ElGamalMessage [] m2Prime = new ElGamalMessage[m2.length + 1];
+
+            for(int i=0;i<1024;i++)
+            {
+                m1Prime[i+1] = m1[i];
+                m2Prime[i+1] = m2[i];
+            }
+
+            if(findGreater(m1, m2))
+            {
+                m1Prime[0] = ElGamal.encryptMessage(commonPublicKey, ElGamal.GetOne());
+                m2Prime[0] = ElGamal.encryptMessage(commonPublicKey, ElGamal.GetNegOneAlternative());
+            }
+            else
+            {
+                m2Prime[0] = ElGamal.encryptMessage(commonPublicKey, ElGamal.GetOne());
+                m1Prime[0] = ElGamal.encryptMessage(commonPublicKey, ElGamal.GetNegOneAlternative());
+            }
+            m1Prime = reEncryptAMessage(m1Prime);
+            m2Prime = reEncryptAMessage(m2Prime);
+
+            if(findGreater(m1,m2))
+            {
+                return m1;
+            }
+            return m2;
+
+        }
+        private ElGamalMessage [] reEncryptAMessage(ElGamalMessage [] m1)
+        {
+            ElGamalMessage [] result = m1;
+            for(int i=0;i<m1.length;i++)
+            {
+                result[i] = ElGamal.reEncryptMessage(result[i], commonPublicKey);
+            }
+            return result;
+        }
         private void initializeGreaterThanTable()
         {
             //prepare greater than table
@@ -220,10 +262,10 @@ public class SimpleWebServer{
 
             greaterThanFunction.saveServerInstance(this);
         }
-        private ElGamalMessage [] findGreater(ElGamalMessage [] bid1, ElGamalMessage [] bid2) throws RemoteException
+        private boolean findGreater(ElGamalMessage [] bid1, ElGamalMessage [] bid2) throws RemoteException
         {
             //execute pairwuse comparison
-            if(greaterThanFunction.CheckDistributedGreater(bid1, bid2))
+            /*if(greaterThanFunction.CheckDistributedGreater(bid1, bid2))
             {
                 return bid1;
             }
@@ -234,7 +276,12 @@ public class SimpleWebServer{
             else
             {
                 return bid1;
+            }*/
+            if(greaterThanFunction.CheckDistributedGreater(bid1, bid2))
+            {
+                return true;
             }
+            return false;
         }
         private BigInteger decryptWinningBid(ElGamalMessage [] result)
         {
@@ -349,7 +396,7 @@ public class SimpleWebServer{
             try{
                 //calling interface function "decrypt_messege" on server 2
                 decrypt_msg_from_server_2= ElGamalBitMessageConversion.StringToElgamalBitMessage(call_server2.decrypt_messege(message,drycpt));
-                System.out.println("Calling Server 2 from remote Decryption: "+decrypt_msg_from_server_2);
+                System.out.println("Calling Server 2 for remote Decryption: "+decrypt_msg_from_server_2);
 
                 // To Do
                 // What to do with the msg,
@@ -372,7 +419,7 @@ public class SimpleWebServer{
             try{
                 //calling interface function "decrypt_messege" on server 2
                 decrypt_msg_from_server_3=ElGamalBitMessageConversion.StringToElgamalBitMessage(call_server3.decrypt_messege(message,drycpt));
-                System.out.println("Calling Server 3 from remote Decryption: "+decrypt_msg_from_server_2);
+                System.out.println("Calling Server 3 for remote Decryption: "+decrypt_msg_from_server_2);
 
                 // To Do
                 // What to do with the msg,

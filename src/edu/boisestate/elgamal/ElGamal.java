@@ -9,9 +9,11 @@ public class ElGamal {
     private final static int PRIME_UNCERTAINTY = 1000000;
     private final static SecureRandom rnd = new SecureRandom();
 
+    private static BigInteger one = BigInteger.ONE;
     private static BigInteger zeroAlternative = BigInteger.valueOf(3);
     private static BigInteger negOneAlternative = BigInteger.valueOf(2);
 
+    public static BigInteger GetOne(){ return one;}
     public static BigInteger GetZeroAlternative() { return zeroAlternative; }
     public static BigInteger GetNegOneAlternative() { return negOneAlternative; }
 
