@@ -66,7 +66,26 @@ public class Client2 extends Thread{
                 // Sending Cipher text to Server
                 out.writeUTF(ciphertext);
                 out.flush();
-                out.close();
+                //out.close();
+                System.out.println("Wating for Server Response");
+
+                // wait for server response
+                while (true){
+                    try {
+                        //Socket soc = Socket.accept();
+                        //String winningBid= (String) dis.readUTF();
+                        String winningBid = (String) objectInputStream.readObject();
+                        System.out.println("Winning Bid: "+ winningBid);
+
+                        if(1==1){
+                            out.close();
+                            break;
+                        }
+
+                    }catch (EOFException e){
+                        System.out.println(e);
+                    }
+                }
             }
         } catch (UnknownHostException e) {
             System.err.println("Don't know about host " + hostName);

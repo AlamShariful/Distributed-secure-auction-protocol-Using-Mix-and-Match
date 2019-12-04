@@ -13,7 +13,11 @@ import otherFunctions.ElGamalBitMessageConversion;
 public class SimpleWebClient extends Thread{
     private static final String hostName = "localhost";
     private static final int PORT = 8089;
+    private static ServerSocket Socket;
 
+    public SimpleWebClient() throws Exception{
+        Socket=new ServerSocket(PORT);
+    }
 
     public static void main(String[] args) throws IOException {
         try (
@@ -25,6 +29,8 @@ public class SimpleWebClient extends Thread{
                 * */
                 InputStream inputStream = serverSocket.getInputStream();
 
+
+
                 // create a DataInputStream so we can read data from it.
                 ObjectInputStream objectInputStream = new ObjectInputStream(inputStream);
 
@@ -35,6 +41,10 @@ public class SimpleWebClient extends Thread{
 
                 //Send user command to Server Via socket
                 DataOutputStream out = new DataOutputStream(serverSocket.getOutputStream());
+
+
+                //receive response from server
+                DataInputStream dis=new DataInputStream(serverSocket.getInputStream());
         ) {
 
             //Read commom Public Key from server
@@ -68,23 +78,29 @@ public class SimpleWebClient extends Thread{
                 System.out.println("sending bits: " + ciphertext);
                 out.writeUTF(ciphertext);
                 out.flush();
-                out.close();
+                //out.close();
+
+                System.out.println("Wating for Server Response");
+
+                // wait for server response
+                while (true){
+                    try {
+                        //Socket soc = Socket.accept();
+                        //String winningBid= (String) dis.readUTF();
+                        String winningBid = (String) objectInputStream.readObject();
+                        System.out.println("Winning Bid: "+ winningBid);
+
+                        if(1==1){
+                            out.close();
+                            break;
+                        }
+
+                    }catch (EOFException e){
+                        System.out.println(e);
+                    }
+                }
 
 
-
-                // Everything in the bottom should go the server
-                //Current Implementation is Showing False because, I'm generating a new private Key
-                // Using BElow line, Remove it
-
-                // Remove Following Line
-                ElGamalPrivateKey privateKey = ElGamal.generateKeyPair(12);
-
-                ElGamalMessage m1= ElGamal.encryptMessage(publicKey,BigInteger.valueOf(10));
-                ElGamalMessage m2= ElGamal.encryptMessage(publicKey,BigInteger.valueOf(10));
-
-                CheckPET check=new CheckPET();
-                Boolean result =check.checkEqualityOfTwoMessage(m1,m2,privateKey);
-                System.out.println(result);
             }
         } catch (UnknownHostException e) {
             System.err.println("Don't know about host " + hostName);

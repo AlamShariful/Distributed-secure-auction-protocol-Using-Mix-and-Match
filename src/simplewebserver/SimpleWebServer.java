@@ -30,6 +30,13 @@ public class SimpleWebServer{
     public ElGamalMessage [] decrypt_msg_from_server_2,decrypt_msg_from_server_3;
 
 
+    //Client Connecting
+    private OutputStream outputStream;
+    private ObjectOutputStream obj;
+    private DataInputStream dis;
+
+
+
     //Interface
     Elgamal_interface call_server2,call_server3;
 
@@ -37,7 +44,7 @@ public class SimpleWebServer{
     //List for Holding Grouppublic key
     List<ElGamalPublicKey> groupPublicKey = new ArrayList<ElGamalPublicKey>();
 
-    public static int i=0;
+    //public static int i=0;
 
     private int bits = 20;
     private BigInteger p = ElGamal.generateSafePrime(bits);
@@ -75,313 +82,345 @@ public class SimpleWebServer{
 
     public void run() throws Exception {
 
+
+
+
         // We are Condidering 4 Client, therefore this loop should Run 4 time (Connect 4 client)
 
-        //while (true) {
-        while (i<4) {
+        while (true) {
+            int m=0;
+            allBiddingCounter=0;
+
+            while (m<4) {
+
+                try{
+
+                    /* wait for a connection from a client */
+                    Socket s = dServerSocket.accept();
+                    System.out.println("Client: "+Integer.sum(m,1)+" Connected");
+
+                    // Send output stream Object Via the socket. To client
+                    //OutputStream outputStream = s.getOutputStream();
+                    outputStream = s.getOutputStream();
+
+                    //ObjectOutputStream obj =new ObjectOutputStream(outputStream);
+                    obj =new ObjectOutputStream(outputStream);
+                    obj.writeObject(commonPublicKey);
+
+                    // read Encrypted messege from User
+                    //DataInputStream dis=new DataInputStream(s.getInputStream());
+                    dis=new DataInputStream(s.getInputStream());
+                    String  str=(String)dis.readUTF();
+
+
+
+
+                    //Assign Received Strings to Different Variables
+                    if(m==0){
+                        // Client 1 is sending Msg
+                        msg_Client1=str;
+                        System.out.println("Client 1 received Encrypted Message in string = " + msg_Client1);
+                        ElGamalMessage [] bitMsg_client1 = ElGamalBitMessageConversion.StringToElgamalBitMessage(msg_Client1);
+                        allBiddings[allBiddingCounter] = new ElGamalMessage[bitMsg_client1.length];
+                        allBiddings[allBiddingCounter] = bitMsg_client1;
+                        allBiddingCounter++;
+                        System.out.println("equality test == " + msg_Client1.equals(ElGamalBitMessageConversion.ElgamalBitMessageToString(bitMsg_client1)));
+                    }
+                    if(m==1){
+                        // Client 2 is sending Msg
+                        msg_Client2=str;
+                        System.out.println("Client 2 received Encrypted Message in string = " + msg_Client2);
+                        ElGamalMessage [] bitMsg_client2 = ElGamalBitMessageConversion.StringToElgamalBitMessage(msg_Client2);
+                        allBiddings[allBiddingCounter] = new ElGamalMessage[bitMsg_client2.length];
+                        allBiddings[allBiddingCounter] = bitMsg_client2;
+                        allBiddingCounter++;
+                        System.out.println("equality test == " + msg_Client2.equals(ElGamalBitMessageConversion.ElgamalBitMessageToString(bitMsg_client2)));
+                    }
+                    if(m==2){
+                        // Client 3 is sending Msg
+                        msg_Client3=str;
+                        System.out.println("Client 3 received Encrypted Message in string = " + msg_Client3);
+                        ElGamalMessage [] bitMsg_client3 = ElGamalBitMessageConversion.StringToElgamalBitMessage(msg_Client3);
+                        allBiddings[allBiddingCounter] = new ElGamalMessage[bitMsg_client3.length];
+                        allBiddings[allBiddingCounter] = bitMsg_client3;
+                        allBiddingCounter++;
+                        System.out.println("equality test == " + msg_Client3.equals(ElGamalBitMessageConversion.ElgamalBitMessageToString(bitMsg_client3)));
+                    }
+                    if(m==3){
+                        // Client 4 is sending Msg
+                        msg_Client4=str;
+                        System.out.println("Client 4 received Encrypted Message in string = " + msg_Client4);
+                        ElGamalMessage [] bitMsg_client4 = ElGamalBitMessageConversion.StringToElgamalBitMessage(msg_Client4);
+                        allBiddings[allBiddingCounter] = new ElGamalMessage[bitMsg_client4.length];
+                        allBiddings[allBiddingCounter] = bitMsg_client4;
+                        allBiddingCounter++;
+                        System.out.println("equality test == " + msg_Client4.equals(ElGamalBitMessageConversion.ElgamalBitMessageToString(bitMsg_client4)));
+                    }
+
+
+                    //Count Connected Client
+                    m++;
+
+
+
+                }catch (Exception e){System.out.println(e);}
+            }
+
+
+
+            System.out.println("4 messages collected. Messages are: \n" + msg_Client1 + "\n" + msg_Client2 + "\n"+ msg_Client3 + "\n"+ msg_Client4 + "\n");
+            System.out.println("checking equality with global storage:");
+            System.out.println(ElGamalBitMessageConversion.ElgamalBitMessageToString(allBiddings[0]).equals(msg_Client1) + ", " + ElGamalBitMessageConversion.ElgamalBitMessageToString(allBiddings[1]).equals(msg_Client2) + ", " + ElGamalBitMessageConversion.ElgamalBitMessageToString(allBiddings[2]).equals(msg_Client3) + ", " + ElGamalBitMessageConversion.ElgamalBitMessageToString(allBiddings[3]).equals(msg_Client4));
+
+            //initialize greater than table
+            initializeGreaterThanTable();
+            //we take bit by bit of pair users
+            ElGamalMessage [] result = allBiddings[0];
+            for(int i=1;i<allBiddingCounter;i++)
+            {
+                result = findGreater(result, allBiddings[i]);
+            }
+
+            System.out.println("winner cipher text found!!, Decrypting bid: ");
+            BigInteger winner = decryptWinningBid(result);
+
+            System.out.println("winner == " + winner);
+
+
+            // Send Winning Bid ConnectedClient
+            String winingBid= winner.toString();
+            System.out.println("Sending Winning Bid to Client");
+            obj.writeObject(winingBid);
+
+
+
+
+            // END
+
+
+                // reset the While Loop
+
+            }
+        }
+        private void initializeGreaterThanTable()
+        {
+            //prepare greater than table
+            BigInteger one = BigInteger.valueOf(1);
+            BigInteger negOne = ElGamal.GetNegOneAlternative();    //just for test, assuming that we represent -1 with 2
+            BigInteger zeroAlt = ElGamal.GetZeroAlternative();    //just for test, assuming that we represent 0 with 50
+
+            ElGamalMessage encOne, encNegOne, encZeroAlt;
+            encOne = ElGamal.encryptMessage(commonPublicKey, one);
+            encZeroAlt = ElGamal.encryptMessage(commonPublicKey, zeroAlt);
+            encNegOne = ElGamal.encryptMessage(commonPublicKey, negOne);
+
+            greaterThanFunction = new GreaterThanFunction(encOne, encNegOne, encZeroAlt);   //sign is equal
+            greaterThanFunction.generateFullGreaterThanTable();
+            greaterThanFunction.PrintTable();
+            greaterThanFunction.ReShuffleAndReEncryptTable(commonPublicKey);
+            greaterThanFunction.PrintTable();
+        }
+        private ElGamalMessage [] findGreater(ElGamalMessage [] bid1, ElGamalMessage [] bid2)
+        {
+            //test with all private key for now
+            List<ElGamalPrivateKey> allPrivateKeys=new ArrayList<ElGamalPrivateKey>();
+            allPrivateKeys.add(server1_privateKey);
+            allPrivateKeys.add(server2_privateKey);
+            allPrivateKeys.add(server3_privateKey);
+            //execute pairwuse comparison
+            if(greaterThanFunction.CheckDistributedGreater(bid1, bid2, allPrivateKeys))
+            {
+                return bid1;
+            }
+            else if(greaterThanFunction.CheckDistributedGreater(bid2, bid1, allPrivateKeys))
+            {
+                return bid2;
+            }
+            else
+            {
+                return bid1;
+            }
+        }
+        private BigInteger decryptWinningBid(ElGamalMessage [] result)
+        {
+            /*all together
+            //test with all private key for now
+            List<ElGamalPrivateKey> allPrivateKeys=new ArrayList<ElGamalPrivateKey>();
+            allPrivateKeys.add(server1_privateKey);
+            allPrivateKeys.add(server2_privateKey);
+            allPrivateKeys.add(server3_privateKey);
+
+            //decrypting
+            String resultBid = ElGamal.decryptDistributedMessageBitByBit(result, allPrivateKeys);
+            resultBid = BitResultHandler.normalizeBitString(resultBid);
+
+            BigInteger decimalResult = BitResultHandler.BitStringToDecimalBigInteger(resultBid);
+
+            return decimalResult;*/
+            //separate server by server decryption
+            BigInteger resultPlainText;
+            ElGamalMessage [] decryptedMessage = result;
+            String decryptedMessageString;
+            //main server
+            decryptedMessage = ElGamal.partialBitbyBitDecryption(result, server1_privateKey);
+
+            //second server
+            decryptedMessage = send_Elgamal_msg_to_Server2_for_decryption(ElGamalBitMessageConversion.ElgamalBitMessageToString(decryptedMessage));
+            //decryptedMessage = ElGamalBitMessageConversion.StringToElgamalBitMessage(decryptedMessageString);
+            //third server
+            decryptedMessage = send_Elgamal_msg_to_Server3_for_decryption(ElGamalBitMessageConversion.ElgamalBitMessageToString(decryptedMessage));
+            //decryptedMessage = ElGamalBitMessageConversion.StringToElgamalBitMessage(decryptedMessageString);
+
+            String resultBid = ElGamal.getStringToBitbyBitDecryption(decryptedMessage);
+            //System.out.println("decrypted message string == " + decryptedMessageString);
+            //String resultBid;
+            resultBid = BitResultHandler.normalizeBitString(resultBid);
+            BigInteger decimalResult = BitResultHandler.BitStringToDecimalBigInteger(resultBid);
+
+            return decimalResult;
+        }
+
+        // calling remote server to additional support
+        public void calling_remote_Servers_interface(){
             try{
-                /* wait for a connection from a client */
-                Socket s = dServerSocket.accept();
-                System.out.println("Client: "+Integer.sum(i,1)+" Connected");
-
-                // Send output stream Object Via the socket. To client
-                OutputStream outputStream = s.getOutputStream();
-                ObjectOutputStream obj =new ObjectOutputStream(outputStream);
-                obj.writeObject(commonPublicKey);
-
-                // read Encrypted messege from User
-                DataInputStream dis=new DataInputStream(s.getInputStream());
-                String  str=(String)dis.readUTF();
-
-
-                //Assign Received Strings to Different Variables
-                if(i==0){
-                    // Client 1 is sending Msg
-                    msg_Client1=str;
-                    System.out.println("Client 1 received Encrypted Message in string = " + msg_Client1);
-                    ElGamalMessage [] bitMsg_client1 = ElGamalBitMessageConversion.StringToElgamalBitMessage(msg_Client1);
-                    allBiddings[allBiddingCounter] = new ElGamalMessage[bitMsg_client1.length];
-                    allBiddings[allBiddingCounter] = bitMsg_client1;
-                    allBiddingCounter++;
-                    System.out.println("equality test == " + msg_Client1.equals(ElGamalBitMessageConversion.ElgamalBitMessageToString(bitMsg_client1)));
-                }
-                if(i==1){
-                    // Client 2 is sending Msg
-                    msg_Client2=str;
-                    System.out.println("Client 2 received Encrypted Message in string = " + msg_Client2);
-                    ElGamalMessage [] bitMsg_client2 = ElGamalBitMessageConversion.StringToElgamalBitMessage(msg_Client2);
-                    allBiddings[allBiddingCounter] = new ElGamalMessage[bitMsg_client2.length];
-                    allBiddings[allBiddingCounter] = bitMsg_client2;
-                    allBiddingCounter++;
-                    System.out.println("equality test == " + msg_Client2.equals(ElGamalBitMessageConversion.ElgamalBitMessageToString(bitMsg_client2)));
-                }
-                if(i==2){
-                    // Client 3 is sending Msg
-                    msg_Client3=str;
-                    System.out.println("Client 3 received Encrypted Message in string = " + msg_Client3);
-                    ElGamalMessage [] bitMsg_client3 = ElGamalBitMessageConversion.StringToElgamalBitMessage(msg_Client3);
-                    allBiddings[allBiddingCounter] = new ElGamalMessage[bitMsg_client3.length];
-                    allBiddings[allBiddingCounter] = bitMsg_client3;
-                    allBiddingCounter++;
-                    System.out.println("equality test == " + msg_Client3.equals(ElGamalBitMessageConversion.ElgamalBitMessageToString(bitMsg_client3)));
-                }
-                if(i==3){
-                    // Client 4 is sending Msg
-                    msg_Client4=str;
-                    System.out.println("Client 4 received Encrypted Message in string = " + msg_Client4);
-                    ElGamalMessage [] bitMsg_client4 = ElGamalBitMessageConversion.StringToElgamalBitMessage(msg_Client4);
-                    allBiddings[allBiddingCounter] = new ElGamalMessage[bitMsg_client4.length];
-                    allBiddings[allBiddingCounter] = bitMsg_client4;
-                    allBiddingCounter++;
-                    System.out.println("equality test == " + msg_Client4.equals(ElGamalBitMessageConversion.ElgamalBitMessageToString(bitMsg_client4)));
-                }
-
-
-                //Count Connected Client
-                i++;
-
-
-
-            }catch (Exception e){System.out.println(e);}
-        }
-        System.out.println("4 messages collected. Messages are: \n" + msg_Client1 + "\n" + msg_Client2 + "\n"+ msg_Client3 + "\n"+ msg_Client4 + "\n");
-        System.out.println("checking equality with global storage:");
-        System.out.println(ElGamalBitMessageConversion.ElgamalBitMessageToString(allBiddings[0]).equals(msg_Client1) + ", " + ElGamalBitMessageConversion.ElgamalBitMessageToString(allBiddings[1]).equals(msg_Client2) + ", " + ElGamalBitMessageConversion.ElgamalBitMessageToString(allBiddings[2]).equals(msg_Client3) + ", " + ElGamalBitMessageConversion.ElgamalBitMessageToString(allBiddings[3]).equals(msg_Client4));
-
-        //initialize greater than table
-        initializeGreaterThanTable();
-        //we take bit by bit of pair users
-        ElGamalMessage [] result = allBiddings[0];
-        for(int i=1;i<allBiddingCounter;i++)
-        {
-            result = findGreater(result, allBiddings[i]);
+                // lookup method to find reference of remote object
+                call_server2 = (Elgamal_interface) Naming.lookup("rmi://localhost:1900"+
+                                "/privateKey");
+                call_server3 = (Elgamal_interface) Naming.lookup("rmi://localhost:2000"+
+                                "/privateKey");
+            }catch (Exception e){
+                System.out.println(e);
+            }
         }
 
-        System.out.println("winner cipher text found!!, Decrypting bid: ");
-        BigInteger winner = decryptWinningBid(result);
-
-        System.out.println("winner == " + winner);
-
-    }
-    private void initializeGreaterThanTable()
-    {
-        //prepare greater than table
-        BigInteger one = BigInteger.valueOf(1);
-        BigInteger negOne = ElGamal.GetNegOneAlternative();    //just for test, assuming that we represent -1 with 2
-        BigInteger zeroAlt = ElGamal.GetZeroAlternative();    //just for test, assuming that we represent 0 with 50
-
-        ElGamalMessage encOne, encNegOne, encZeroAlt;
-        encOne = ElGamal.encryptMessage(commonPublicKey, one);
-        encZeroAlt = ElGamal.encryptMessage(commonPublicKey, zeroAlt);
-        encNegOne = ElGamal.encryptMessage(commonPublicKey, negOne);
-
-        greaterThanFunction = new GreaterThanFunction(encOne, encNegOne, encZeroAlt);   //sign is equal
-        greaterThanFunction.generateFullGreaterThanTable();
-        greaterThanFunction.PrintTable();
-        greaterThanFunction.ReShuffleAndReEncryptTable(commonPublicKey);
-        greaterThanFunction.PrintTable();
-    }
-    private ElGamalMessage [] findGreater(ElGamalMessage [] bid1, ElGamalMessage [] bid2)
-    {
-        //test with all private key for now
-        List<ElGamalPrivateKey> allPrivateKeys=new ArrayList<ElGamalPrivateKey>();
-        allPrivateKeys.add(server1_privateKey);
-        allPrivateKeys.add(server2_privateKey);
-        allPrivateKeys.add(server3_privateKey);
-        //execute pairwuse comparison
-        if(greaterThanFunction.CheckDistributedGreater(bid1, bid2, allPrivateKeys))
-        {
-            return bid1;
-        }
-        else if(greaterThanFunction.CheckDistributedGreater(bid2, bid1, allPrivateKeys))
-        {
-            return bid2;
-        }
-        else
-        {
-            return bid1;
-        }
-    }
-    private BigInteger decryptWinningBid(ElGamalMessage [] result)
-    {
-        /*all together
-        //test with all private key for now
-        List<ElGamalPrivateKey> allPrivateKeys=new ArrayList<ElGamalPrivateKey>();
-        allPrivateKeys.add(server1_privateKey);
-        allPrivateKeys.add(server2_privateKey);
-        allPrivateKeys.add(server3_privateKey);
-
-        //decrypting
-        String resultBid = ElGamal.decryptDistributedMessageBitByBit(result, allPrivateKeys);
-        resultBid = BitResultHandler.normalizeBitString(resultBid);
-
-        BigInteger decimalResult = BitResultHandler.BitStringToDecimalBigInteger(resultBid);
-
-        return decimalResult;*/
-        //separate server by server decryption
-        BigInteger resultPlainText;
-        ElGamalMessage [] decryptedMessage = result;
-        String decryptedMessageString;
-        //main server
-        decryptedMessage = ElGamal.partialBitbyBitDecryption(result, server1_privateKey);
-
-        //second server
-        decryptedMessage = send_Elgamal_msg_to_Server2_for_decryption(ElGamalBitMessageConversion.ElgamalBitMessageToString(decryptedMessage));
-        //decryptedMessage = ElGamalBitMessageConversion.StringToElgamalBitMessage(decryptedMessageString);
-        //third server
-        decryptedMessage = send_Elgamal_msg_to_Server3_for_decryption(ElGamalBitMessageConversion.ElgamalBitMessageToString(decryptedMessage));
-        //decryptedMessage = ElGamalBitMessageConversion.StringToElgamalBitMessage(decryptedMessageString);
-
-        String resultBid = ElGamal.getStringToBitbyBitDecryption(decryptedMessage);
-        //System.out.println("decrypted message string == " + decryptedMessageString);
-        //String resultBid;
-        resultBid = BitResultHandler.normalizeBitString(resultBid);
-        BigInteger decimalResult = BitResultHandler.BitStringToDecimalBigInteger(resultBid);
-
-        return decimalResult;
-    }
-
-    // calling remote server to additional support
-    public void calling_remote_Servers_interface(){
-        try{
-            // lookup method to find reference of remote object
-            call_server2 = (Elgamal_interface) Naming.lookup("rmi://localhost:1900"+
-                            "/privateKey");
-            call_server3 = (Elgamal_interface) Naming.lookup("rmi://localhost:2000"+
-                            "/privateKey");
-        }catch (Exception e){
-            System.out.println(e);
-        }
-    }
-
-    public void getting_publicKey_For_This_server(){
-        BigInteger result=null;
-        ElGamalPrivateKey privateKey= new ElGamalPrivateKey();
+        public void getting_publicKey_For_This_server(){
+            BigInteger result=null;
+            ElGamalPrivateKey privateKey= new ElGamalPrivateKey();
 
 
-        //call Elgamal package to get private key
-        privateKey = ElGamal.generateKeyPair(bits, p, g);
+            //call Elgamal package to get private key
+            privateKey = ElGamal.generateKeyPair(bits, p, g);
 
-        //private key
-        //server1_privateKey=privateKey.getPrivateKey();
-        server1_privateKey=privateKey;
+            //private key
+            //server1_privateKey=privateKey.getPrivateKey();
+            server1_privateKey=privateKey;
 
-        //get public key
-        server1_publicKey= privateKey.getPublicKey();
-
-        // add this public key to groupPublicKey list
-        groupPublicKey.add(server1_publicKey);
-
-
-        System.out.println("Server 1 Private Key: "+server1_privateKey.getPrivateKey());
-        System.out.println("Server 1 Public key: "+server1_publicKey.getP()+","+server1_publicKey.getG()+","+server1_publicKey.getB());
-
-    }
-
-    public void getting_publicKey_From_server2(){
-        ElGamalPrivateKey answer;
-        String value="get_privateKey";
-        try
-        {
-            answer = call_server2.generate_privatekey(value, bits, p, g);
-            // server 2 key pair
-            server2_publicKey=answer.getPublicKey();
-            server2_privateKey=answer;
+            //get public key
+            server1_publicKey= privateKey.getPublicKey();
 
             // add this public key to groupPublicKey list
-            groupPublicKey.add(server2_publicKey);
+            groupPublicKey.add(server1_publicKey);
 
-            System.out.println("Server 2 Private Key: "+server2_privateKey.getPrivateKey());
-            System.out.println("Server 2 Public key: "+server2_publicKey.getP()+","+server2_publicKey.getG()+","+server2_publicKey.getB());
+
+            System.out.println("Server 1 Private Key: "+server1_privateKey.getPrivateKey());
+            System.out.println("Server 1 Public key: "+server1_publicKey.getP()+","+server1_publicKey.getG()+","+server1_publicKey.getB());
+
         }
-        catch(Exception ae)
-        {
-            System.out.println(ae);
+
+        public void getting_publicKey_From_server2(){
+            ElGamalPrivateKey answer;
+            String value="get_privateKey";
+            try
+            {
+                answer = call_server2.generate_privatekey(value, bits, p, g);
+                // server 2 key pair
+                server2_publicKey=answer.getPublicKey();
+                server2_privateKey=answer;
+
+                // add this public key to groupPublicKey list
+                groupPublicKey.add(server2_publicKey);
+
+                //System.out.println("Server 2 Private Key: "+server2_privateKey.getPrivateKey());
+                //System.out.println("Server 2 Public key: "+server2_publicKey.getP()+","+server2_publicKey.getG()+","+server2_publicKey.getB());
+            }
+            catch(Exception ae)
+            {
+                System.out.println(ae);
+            }
         }
-    }
 
 
-    public void getting_publicKey_From_server3(){
-        ElGamalPrivateKey answer;
-        String value="get_privateKey";
-        try
-        {
-            answer = call_server3.generate_privatekey(value, bits, p, g);
+        public void getting_publicKey_From_server3(){
+            ElGamalPrivateKey answer;
+            String value="get_privateKey";
+            try
+            {
+                answer = call_server3.generate_privatekey(value, bits, p, g);
 
-            // server 3 keypair
-            server3_publicKey=answer.getPublicKey();
-            server3_privateKey=answer;
+                // server 3 keypair
+                server3_publicKey=answer.getPublicKey();
+                server3_privateKey=answer;
 
-            // add this public key to groupPublicKey list
-            groupPublicKey.add(server3_publicKey);
+                // add this public key to groupPublicKey list
+                groupPublicKey.add(server3_publicKey);
 
-            System.out.println("Server 3 Private Key: "+server3_privateKey.getPrivateKey());
-            System.out.println("Server 3 Public key: "+server3_publicKey.getP()+","+server3_publicKey.getG()+","+server3_publicKey.getB());
+                //System.out.println("Server 3 Private Key: "+server3_privateKey.getPrivateKey());
+               // System.out.println("Server 3 Public key: "+server3_publicKey.getP()+","+server3_publicKey.getG()+","+server3_publicKey.getB());
+            }
+            catch(Exception ae)
+            {
+                System.out.println(ae);
+            }
         }
-        catch(Exception ae)
-        {
-            System.out.println(ae);
+
+        // Written today on 12/2/2019
+        public ElGamalMessage [] send_Elgamal_msg_to_Server2_for_decryption(String message){
+            String drycpt="get_messege";
+
+            // replace this value with the appropriate Elgamal_msg type
+            //ElGamalMessage m1=null;
+            try{
+                //calling interface function "decrypt_messege" on server 2
+                decrypt_msg_from_server_2= ElGamalBitMessageConversion.StringToElgamalBitMessage(call_server2.decrypt_messege(message,drycpt));
+                System.out.println("Calling Server 2 from remote Decryption: "+decrypt_msg_from_server_2);
+
+                // To Do
+                // What to do with the msg,
+                // don't know what type of message is required
+                // therefore keep Biginteger, but can be changed accordingly
+
+
+
+
+            }catch (Exception e){
+                System.out.println(e);
+            }
+            return decrypt_msg_from_server_2;
         }
-    }
+        public ElGamalMessage[] send_Elgamal_msg_to_Server3_for_decryption(String message){
+            String drycpt="get_messege";
 
-    // Written today on 12/2/2019
-    public ElGamalMessage [] send_Elgamal_msg_to_Server2_for_decryption(String message){
-        String drycpt="get_messege";
+            // replace this value with the appropriate Elgamal_msg type
+            //ElGamalMessage m1=null;
+            try{
+                //calling interface function "decrypt_messege" on server 2
+                decrypt_msg_from_server_3=ElGamalBitMessageConversion.StringToElgamalBitMessage(call_server3.decrypt_messege(message,drycpt));
+                System.out.println("Calling Server 3 from remote Decryption: "+decrypt_msg_from_server_2);
 
-        // replace this value with the appropriate Elgamal_msg type
-        //ElGamalMessage m1=null;
-        try{
-            //calling interface function "decrypt_messege" on server 2
-            decrypt_msg_from_server_2= ElGamalBitMessageConversion.StringToElgamalBitMessage(call_server2.decrypt_messege(message,drycpt));
-            System.out.println("Calling Server 2 from remote Decryption: "+decrypt_msg_from_server_2);
-
-            // To Do
-            // What to do with the msg,
-            // don't know what type of message is required
-            // therefore keep Biginteger, but can be changed accordingly
+                // To Do
+                // What to do with the msg,
+                // don't know what type of message is required
+                // therefore keep Biginteger, but can be changed accordingly
 
 
-
-
-        }catch (Exception e){
-            System.out.println(e);
+            }catch (Exception e){
+                System.out.println(e);
+            }
+            return decrypt_msg_from_server_3;
         }
-        return decrypt_msg_from_server_2;
-    }
-    public ElGamalMessage[] send_Elgamal_msg_to_Server3_for_decryption(String message){
-        String drycpt="get_messege";
-
-        // replace this value with the appropriate Elgamal_msg type
-        //ElGamalMessage m1=null;
-        try{
-            //calling interface function "decrypt_messege" on server 2
-            decrypt_msg_from_server_3=ElGamalBitMessageConversion.StringToElgamalBitMessage(call_server3.decrypt_messege(message,drycpt));
-            System.out.println("Calling Server 3 from remote Decryption: "+decrypt_msg_from_server_2);
-
-            // To Do
-            // What to do with the msg,
-            // don't know what type of message is required
-            // therefore keep Biginteger, but can be changed accordingly
 
 
-        }catch (Exception e){
-            System.out.println(e);
+
+        /* This method is called when the program is run from the command line. */
+        public static void main (String argv[]) throws Exception {
+            /* Create a SimpleWebServer object, and run it */
+            SimpleWebServer sws = new SimpleWebServer();
+
+            // run the coordinator server (this server)
+            sws.run();
+
+
+
+
         }
-        return decrypt_msg_from_server_3;
-    }
-
-
-
-    /* This method is called when the program is run from the command line. */
-    public static void main (String argv[]) throws Exception {
-        /* Create a SimpleWebServer object, and run it */
-        SimpleWebServer sws = new SimpleWebServer();
-
-        // run the coordinator server (this server)
-        sws.run();
-
-
-
-
-    }
 }
