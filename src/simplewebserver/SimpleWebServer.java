@@ -96,15 +96,11 @@ public class SimpleWebServer{
                     System.out.println("Client: "+Integer.sum(m,1)+" Connected");
 
                     // Send output stream Object Via the socket. To client
-                    //OutputStream outputStream = s.getOutputStream();
                     outputStream = s.getOutputStream();
-
-                    //ObjectOutputStream obj =new ObjectOutputStream(outputStream);
                     obj =new ObjectOutputStream(outputStream);
                     obj.writeObject(commonPublicKey);
 
                     // read Encrypted messege from User
-                    //DataInputStream dis=new DataInputStream(s.getInputStream());
                     dis=new DataInputStream(s.getInputStream());
                     String  str=(String)dis.readUTF();
 
@@ -199,8 +195,7 @@ public class SimpleWebServer{
 
             }
         }
-        private ElGamalMessage [] generatePairTableAndFindMax(ElGamalMessage [] m1, ElGamalMessage [] m2) throws RemoteException
-        {
+        private ElGamalMessage [] generatePairTableAndFindMax(ElGamalMessage [] m1, ElGamalMessage [] m2) throws RemoteException {
             ElGamalMessage [] m1Prime = new ElGamalMessage[m1.length + 1];
 
             ElGamalMessage [] m2Prime = new ElGamalMessage[m2.length + 1];
@@ -231,8 +226,7 @@ public class SimpleWebServer{
             return m2;
 
         }
-        private ElGamalMessage [] reEncryptAMessage(ElGamalMessage [] m1)
-        {
+        private ElGamalMessage [] reEncryptAMessage(ElGamalMessage [] m1) {
             ElGamalMessage [] result = m1;
             for(int i=0;i<m1.length;i++)
             {
@@ -240,8 +234,7 @@ public class SimpleWebServer{
             }
             return result;
         }
-        private void initializeGreaterThanTable()
-        {
+        private void initializeGreaterThanTable() {
             //prepare greater than table
             System.out.println("Generating Greater than table");
             BigInteger one = BigInteger.valueOf(1);
@@ -262,8 +255,7 @@ public class SimpleWebServer{
 
             greaterThanFunction.saveServerInstance(this);
         }
-        private boolean findGreater(ElGamalMessage [] bid1, ElGamalMessage [] bid2) throws RemoteException
-        {
+        private boolean findGreater(ElGamalMessage [] bid1, ElGamalMessage [] bid2) throws RemoteException {
             //execute pairwuse comparison
             /*if(greaterThanFunction.CheckDistributedGreater(bid1, bid2))
             {
@@ -283,8 +275,7 @@ public class SimpleWebServer{
             }
             return false;
         }
-        private BigInteger decryptWinningBid(ElGamalMessage [] result)
-        {
+        private BigInteger decryptWinningBid(ElGamalMessage [] result) {
             BigInteger resultPlainText;
             ElGamalMessage [] decryptedMessage = result;
             String decryptedMessageString;
@@ -387,7 +378,6 @@ public class SimpleWebServer{
             }
         }
 
-        // Written today on 12/2/2019
         public ElGamalMessage [] send_Elgamal_msg_to_Server2_for_decryption(String message){
             String drycpt="get_messege";
 
@@ -432,8 +422,8 @@ public class SimpleWebServer{
             }
             return decrypt_msg_from_server_3;
         }
-    public ElGamalMessage getDivision(ElGamalMessage m1, ElGamalMessage m2) throws RemoteException
-    {
+
+        public ElGamalMessage getDivision(ElGamalMessage m1, ElGamalMessage m2) throws RemoteException {
         BigInteger alphaMessage1, betaMessage1,alphaMessage2, betaMessage2, divideAlpha, divideBeta;
 
         // get alpha and beta for message 1
@@ -453,8 +443,7 @@ public class SimpleWebServer{
 
         return newelgamal;
     }
-        public ElGamalMessage decrypt_messege (ElGamalMessage msg) throws RemoteException
-        {
+        public ElGamalMessage decrypt_messege (ElGamalMessage msg) throws RemoteException {
             ElGamalMessage elgMsg = ElGamal.decryptGroupMessage(msg, server1_privateKey);
             //partially decrypt the message
             return elgMsg;

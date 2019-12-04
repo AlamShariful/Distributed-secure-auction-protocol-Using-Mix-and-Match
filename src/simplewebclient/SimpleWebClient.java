@@ -90,13 +90,14 @@ public class SimpleWebClient extends Thread{
                         String winningBid = (String) objectInputStream.readObject();
                         System.out.println("Winning Bid: "+ winningBid);
 
-                        if(1==1){
+                        if(winningBid!=""){
                             out.close();
                             break;
                         }
 
                     }catch (EOFException e){
-                        System.out.println(e);
+                        //System.out.println(e);
+                        break;
                     }
                 }
 
