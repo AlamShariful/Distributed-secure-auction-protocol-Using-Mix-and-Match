@@ -11,7 +11,7 @@ import edu.boisestate.elgamal.ElGamal;
 import edu.boisestate.elgamal.ElGamalMessage;
 import edu.boisestate.elgamal.ElGamalPrivateKey;
 import edu.boisestate.elgamal.ElGamalPublicKey;
-import simplewebserver.SimpleWebServer;
+import CoordinatorServer.CoordinatorServer;
 
 
 public class GreaterThanFunction
@@ -21,7 +21,7 @@ public class GreaterThanFunction
     private CheckPET checkpet;
 
 
-    private SimpleWebServer server;
+    private CoordinatorServer server;
 
     public GreaterThanFunction(ElGamalMessage mEncOfOne, ElGamalMessage mEncOfNegOne, ElGamalMessage mEncOfZeroAlt)
     {
@@ -119,7 +119,7 @@ public class GreaterThanFunction
                                + "         " + tableRow[i].getOutA().getEncryptedMessage() + "          " + tableRow[i].getOutB().getEncryptedMessage());
         }
     }
-    public void saveServerInstance(SimpleWebServer server)
+    public void saveServerInstance(CoordinatorServer server)
     {
         this.server = server;
     }

@@ -1,23 +1,19 @@
-package simplewebclient;
+package Clients;
 
-import java.io.*;
-import java.math.BigInteger;
-import java.net.*;
-import java.util.Scanner;
-
-import PET.CheckPET;
 import edu.boisestate.elgamal.*;
 import otherFunctions.ElGamalBitMessageConversion;
 
+import java.io.*;
+import java.math.BigInteger;
+import java.net.Socket;
+import java.net.UnknownHostException;
+import java.util.Scanner;
 
-public class SimpleWebClient extends Thread{
+public class Client4 extends Thread{
     private static final String hostName = "localhost";
-    private static final int PORT = 8089;
-    private static ServerSocket Socket;
+    //private static final int PORT = 8089;
 
-    public SimpleWebClient() throws Exception{
-        Socket=new ServerSocket(PORT);
-    }
+    private static final int PORT = 6589;
 
     public static void main(String[] args) throws IOException {
         try (
@@ -29,8 +25,6 @@ public class SimpleWebClient extends Thread{
                 * */
                 InputStream inputStream = serverSocket.getInputStream();
 
-
-
                 // create a DataInputStream so we can read data from it.
                 ObjectInputStream objectInputStream = new ObjectInputStream(inputStream);
 
@@ -41,10 +35,6 @@ public class SimpleWebClient extends Thread{
 
                 //Send user command to Server Via socket
                 DataOutputStream out = new DataOutputStream(serverSocket.getOutputStream());
-
-
-                //receive response from server
-                DataInputStream dis=new DataInputStream(serverSocket.getInputStream());
         ) {
 
             //Read commom Public Key from server
@@ -68,8 +58,10 @@ public class SimpleWebClient extends Thread{
                 String s = binary.binaryTostring(userInput);
                 System.out.println("Binary form:"+s);
 
-                // split string bit by bit and Encrypt each bit
-                ElGamalMessage [] getInputTable= binary.splitstringAndencryption(s, publicKey);
+
+
+                /// split string bit by bit and Encrypt each bit
+                ElGamalMessage[] getInputTable= binary.splitstringAndencryption(s, publicKey);
 
                 //String representation of ciphertext
                 ciphertext = ElGamalBitMessageConversion.ElgamalBitMessageToString(getInputTable);
@@ -79,7 +71,6 @@ public class SimpleWebClient extends Thread{
                 out.writeUTF(ciphertext);
                 out.flush();
                 //out.close();
-
                 System.out.println("Wating for Server Response");
 
                 // wait for server response
@@ -88,7 +79,7 @@ public class SimpleWebClient extends Thread{
                         //Socket soc = Socket.accept();
                         //String winningBid= (String) dis.readUTF();
                         String winningBid = (String) objectInputStream.readObject();
-                        System.out.println("Winning Bid: "+ winningBid);
+                        System.out.println("Winning Bid: "+winningBid);
 
                         if(winningBid!=""){
                             out.close();
@@ -113,4 +104,5 @@ public class SimpleWebClient extends Thread{
             e.printStackTrace();
         }
     }
+
 }

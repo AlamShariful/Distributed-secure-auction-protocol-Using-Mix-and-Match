@@ -1,4 +1,4 @@
-package simplewebserver;
+package CoordinatorServer;
 
 
 import GreaterThanFunction.GreaterThanFunction;
@@ -10,15 +10,12 @@ import otherFunctions.ElGamalBitMessageConversion;
 import java.io.*;
 import java.math.BigInteger;
 import java.net.*;
-import static java.nio.file.StandardOpenOption.APPEND;
-import java.nio.file.*;
 import java.rmi.Naming;
 import java.rmi.RemoteException;
-import java.rmi.registry.LocateRegistry;
 import java.util.*;
 //import com.google.gson.*;
 
-public class SimpleWebServer{
+public class CoordinatorServer{
 
     /* Run the HTTP server on this TCP port. */
     //private static final int PORT = 8089;
@@ -65,7 +62,7 @@ public class SimpleWebServer{
     private static ServerSocket dServerSocket4;
 
 
-    public SimpleWebServer () throws Exception {
+    public CoordinatorServer () throws Exception {
         //dServerSocket = new ServerSocket (PORT);
         dServerSocket1 = new ServerSocket (PORT[0]);
         dServerSocket2 = new ServerSocket (PORT[1]);
@@ -523,7 +520,7 @@ public class SimpleWebServer{
         /* This method is called when the program is run from the command line. */
         public static void main (String argv[]) throws Exception {
             /* Create a SimpleWebServer object, and run it */
-            SimpleWebServer sws = new SimpleWebServer();
+            CoordinatorServer sws = new CoordinatorServer();
 
             // run the coordinator server (this server)
             sws.run();
